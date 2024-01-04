@@ -24,6 +24,7 @@ namespace ShellKeskin
             void addToOSRecursive(Directory *path);
             void addToRoot(File* obj);
             void addToFolders();
+            void assignParents();
             //void removeElement();
 
             //Helpers
@@ -38,7 +39,7 @@ namespace ShellKeskin
             void cp(); // #file adını al, regularFile obj oluştur, fileTOVector kullan, filesysteme pushla, myOS yazdır
             void link(); // #file adını al, filesystemde regFileı bul, linkedFile obj oluştur, linkedFile obj pointerıyla regFile pointle, filesysteme pushla, myOS yazdır 
             void cd(); //directory name al, pathVectorde varsa ve doğru komut girdiyse (.. etc) current pathi değiştir
-            void cd_checkInputs();
+            void cd_checkInputs(Directory *temp_parent);
             void cd_checkPaths();
             void cat(); // eleman yazdır
 

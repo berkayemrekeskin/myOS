@@ -107,7 +107,10 @@ namespace FileSystemKeskin
         return this->elements;
     }
 
-    void Directory::setParent(Directory* parent) { this->parentDirectory = parent; }
+    void Directory::setParent(Directory* parent) 
+    {
+        this->parentDirectory = parent; 
+    }
     Directory* Directory::getParent() const { return this->parentDirectory; }
 
 

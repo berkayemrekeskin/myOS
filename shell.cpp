@@ -98,51 +98,84 @@ namespace ShellKeskin
         }
         os.close();
 
-
         this->addToFolders(); // Add special directories elements to them
+        this->assignParents(); // Assign parents of directories
         this->checkInput(); // Get & check input
         
     }
 
     void Shell::addToFolders()
     {
-        for(const auto &folder : this->root->getElements())
+        for(auto directory : this->root->getElements())
         {
-            if(dynamic_cast<Directory *>(folder))
-                if(folder->getPath() == root->getPath() + folder->getName()) 
-                    dynamic_cast<Directory *>(folder)->setParent(root); 
-        }
-
-        for(const auto &folder : this->root->getElements())
-        {
-            for(const auto &element : this->root->getElements())
+            if(dynamic_cast<Directory*>(directory))
             {
-                if(dynamic_cast<Directory *>(folder))   // Find directory
+                for(auto element : this->root->getElements())
                 {
-                    cout << element->getPath() << " " << folder->getPath() << endl;
-                    if(element->getPath() == folder->getPath()) // Check their paths
+                    if(element->getPath() == directory->getPath() + "/" + element->getName())
                     {
-                        if(dynamic_cast<Directory*>(element))   // Check if the element is a directory
-                            dynamic_cast<Directory*>(element)->setParent(dynamic_cast<Directory*>(folder)); // Set it's parent if it is directory
-                        Directory *obj = dynamic_cast<Directory *>(folder);
-                        obj->addElements(element);
-                    } 
+                        dynamic_cast<Directory*>(directory)->addElements(element);
+                        cout << directory->getName() << " " << element->getName() << endl;
+                    }
                 }
             }
         }
+        //for(const auto &folder : this->root->getElements())
+        //{
+        //    if(dynamic_cast<Directory *>(folder))
+        //        if(folder->getPath() == root->getPath()) 
+        //            dynamic_cast<Directory *>(folder)->setParent(root); 
+        //}
+//
+        //for(const auto &folder : this->root->getElements())
+        //{
+        //    for(const auto &element : this->root->getElements())
+        //    {
+        //        if(dynamic_cast<Directory *>(folder))   // Find directory
+        //        {
+        //            cout << element->getPath() << " " << absolutePath(folder) << endl;
+        //            if(element->getPath() == absolutePath(folder)) // Check their paths
+        //            {
+        //                if(dynamic_cast<Directory*>(element))   // Check if the element is a directory
+        //                    dynamic_cast<Directory*>(element)->setParent(dynamic_cast<Directory*>(folder)); // Set it's parent if it is directory
+        //                Directory *obj = dynamic_cast<Directory *>(folder);
+        //                obj->addElements(element);
+        //            } 
+        //        }
+        //    }
+        //}
          //TEST THE IS ROOT GETS THE ELEMENTS
-       //for(const auto& elm : this->root->getElements())
-       //{
-       //    cout << elm->getName() << endl;
-       //    if(dynamic_cast<Directory *>(elm))
-       //    {
-       //        for(const auto& obj : dynamic_cast<Directory *>(elm)->getElements())
-       //        {
-       //            cout << " - - - " << obj->getName() << endl;
-       //        }
-       //    }
-       //}
-        
+        //for(const auto& elm : this->root->getElements())
+        //{
+        //    cout << elm->getName() << endl;
+        //    if(dynamic_cast<Directory *>(elm))
+        //    {
+        //        for(const auto& obj : dynamic_cast<Directory *>(elm)->getElements())
+        //        {
+        //            cout << " - - - " << obj->getName() << endl;
+        //        }
+        //    }
+        //}
+    }
+    void Shell::assignParents()
+    {
+        for(auto folder : this->root->getElements())
+        {
+            if(dynamic_cast<Directory*>(folder))
+            {
+                if(folder->getPath() == this->root->getPath() + folder->getName())
+                {
+                    dynamic_cast<Directory*>(folder)->setParent(this->root);
+                }
+                for(auto elements : dynamic_cast<Directory*>(folder)->getElements())
+                {
+                    if(dynamic_cast<Directory*>(elements))
+                    {
+                        dynamic_cast<Directory*>(elements)->setParent(dynamic_cast<Directory*>(folder));
+                    }
+                }
+            }
+        }
     }
     void Shell::addToRoot(File *obj)
     {
@@ -240,8 +273,6 @@ namespace ShellKeskin
 
     void Shell::ls(Directory *current)
     {
-        //cout << "(LS) (1) Current Path: " << this->currentDirectory << endl; 
-        //Check if '-R' used
         if(this->inputs.size() == 2 && this->inputs[1] == "-R")
         {
             //this->lsRecursive(currentDirectory,isOver);
@@ -285,28 +316,56 @@ namespace ShellKeskin
         }
         for(auto elm : current->getElements())
         {
-            if(current->getPath() + elm->getName() == elm->getPath())
+            if(current == root)
             {
-                if(dynamic_cast<Directory*>(elm))
+                if(elm->getPath() == root->getPath() + elm->getName())
                 {
-                    cout << "D " << elm->getName() << "        " << elm->getTime() << endl;
+                    if(dynamic_cast<Directory*>(elm))
+                    {
+                        cout << "D " << elm->getName() << "        " << elm->getTime() << endl;
+                    }
+                    else if(dynamic_cast<RegularFile*>(elm))
+                    {
+                        RegularFile * obj = dynamic_cast<RegularFile *>(elm);
+                        cout << "F " << obj->getName() << "        " << obj->getTime() << "        " << obj->getSize() << obj << endl;
+                    }
+                    else if(dynamic_cast<SoftLinkedFile*>(elm))
+                    {
+                        SoftLinkedFile * obj = dynamic_cast<SoftLinkedFile *>(elm);
+                        //#okurken pointer yanlış adres tutuyor çöz onu
+                    //cout << obj << endl;
+                    //cout << dynamic_cast<SoftLinkedFile *>(elm) << " ";
+                    //cout << dynamic_cast<SoftLinkedFile *>(elm)->getPointer()  << " " << obj->getPointer() << endl;
+                        cout << "F " << obj->getName() << "        " << obj->getTime() << "        " << obj->getPointer() << endl;
+                    }
                 }
-                else if(dynamic_cast<RegularFile*>(elm))
-                {
-                    RegularFile * obj = dynamic_cast<RegularFile *>(elm);
-                    cout << "F " << obj->getName() << "        " << obj->getTime() << "        " << obj->getSize() << obj << endl;
-                }
-                else if(dynamic_cast<SoftLinkedFile*>(elm))
-                {
-                    SoftLinkedFile * obj = dynamic_cast<SoftLinkedFile *>(elm);
-                    //#okurken pointer yanlış adres tutuyor çöz onu
-                   //cout << obj << endl;
-                   //cout << dynamic_cast<SoftLinkedFile *>(elm) << " ";
-                   //cout << dynamic_cast<SoftLinkedFile *>(elm)->getPointer()  << " " << obj->getPointer() << endl;
-                    cout << "F " << obj->getName() << "        " << obj->getTime() << "        " << obj->getPointer() << endl;
-                }
-                
             }
+            else
+            {
+               if(elm->getPath() == current->getPath() + "/" + elm->getName())
+                {
+                    if(dynamic_cast<Directory*>(elm))
+                    {
+                        cout << "D " << elm->getName() << "        " << elm->getTime() << endl;
+                    }
+                    else if(dynamic_cast<RegularFile*>(elm))
+                    {
+                        RegularFile * obj = dynamic_cast<RegularFile *>(elm);
+                        cout << "F " << obj->getName() << "        " << obj->getTime() << "        " << obj->getSize() << obj << endl;
+                    }
+                    else if(dynamic_cast<SoftLinkedFile*>(elm))
+                    {
+                        SoftLinkedFile * obj = dynamic_cast<SoftLinkedFile *>(elm);
+                        //#okurken pointer yanlış adres tutuyor çöz onu
+                    //cout << obj << endl;
+                    //cout << dynamic_cast<SoftLinkedFile *>(elm) << " ";
+                    //cout << dynamic_cast<SoftLinkedFile *>(elm)->getPointer()  << " " << obj->getPointer() << endl;
+                        cout << "F " << obj->getName() << "        " << obj->getTime() << "        " << obj->getPointer() << endl;
+                    }
+                    
+                } 
+            }
+            
         }
     }
 
@@ -321,56 +380,42 @@ namespace ShellKeskin
         else
         {
             for(auto elm : root->getElements())
-                if(this->inputs[1] == elm->getName() && currentDirectory->getPath() == elm->getPath()) //If names and paths are same
-                    throw invalid_argument("There is already an existing directory!\n");
+            {
+                if(currentDirectory == root)
+                {
+                    if(elm->getName() == inputs[1] && elm->getPath() == currentDirectory->getPath() + elm->getName())
+                    {
+                        throw invalid_argument("There is already an existing directory!\n");
+                    }
+                }
+                else
+                {
+                    if(elm->getName() == inputs[1] && elm->getPath() == currentDirectory->getPath() + "/" + elm->getName())
+                    {
+                        throw invalid_argument("There is already an existing directory!\n");
+                    }
+                }
+            }
 
             //Create directory on current path
             Directory *obj = new Directory;
             obj->setName(inputs[1]);
+
             if(currentDirectory == root)
-                obj->setPath(absolutePath(currentDirectory) + obj->getName());
+                obj->setPath(root->getPath() + obj->getName());
             else
-                obj->setPath(absolutePath(currentDirectory));
+                obj->setPath(currentDirectory->getPath() + "/" + obj->getName());
 
+            obj->setParent(currentDirectory);
+
+            cout << "P:" << obj->getParent()->getName() << " " << "C:" << obj->getName() << endl;
             this->addToRoot(obj);
-            this->addToFolders();
-
-            cout << "(MKDIR) objpath: " << obj->getPath() << endl;
-            cout << "Current path name: " << currentDirectory->getPath() << " " << currentDirectory->getName() << endl; 
-
-//. ve .. oluşturma sadece shell başlarken ve mkdir yapınca oluşturulup shell kapanınca yok olacak ekilde yap, printlerken if bloğunda yazdır.
             
-            //ŞUNLARI SİL AG
-            //Directory *current = new Directory;
-            //current->setName(".");
-            //if(currentDirectory->getPath() != "/")
-            //    current->setPath(currentDirectory->getPath() + "/" + this->inputs[1]);
-            //else
-            //    current->setPath(currentDirectory->getPath() + this->inputs[1]);
-            //this->addToFileSystem(current);
-            //this->addToRoot(current);
-//
-            ////cout << "(MKDIR) Created directory inside Path: " << current->getPath() << endl;
-//
-            //Directory *father = new Directory;
-            //father->setName("..");
-            //if(currentDirectory->getPath() != "/")
-            //    father->setPath(currentDirectory->getPath() + "/" + this->inputs[1]);
-            //else
-            //    father->setPath(currentDirectory->getPath() + this->inputs[1]);
-            ////cout << "(MKDIR) Father Path: " << father->getPath() << endl;
-            //this->addToFileSystem(father);
-            //this->addToRoot(father);
-//
-//
-            //obj->addElements(current);
-            //obj->addElements(father);
-
-            //for(auto elm : this->root->getElements())
-            //{
-            //    cout << elm->getName() << " " << elm->getPath() << endl;
-            //}
+            if(currentDirectory != root)
+                currentDirectory->addElements(obj);
             
+            cout << obj->getPath() << endl;
+        
         }
     }
 
@@ -402,7 +447,6 @@ namespace ShellKeskin
         //    }
         //}
     }
-
 
     void Shell::cp()
     {
@@ -436,8 +480,6 @@ namespace ShellKeskin
         {
             if(this->inputs[1] == elm->getName() && elm->getPath() == this->currentDirectory->getPath())
             {
-                //RegularFile *temp = new RegularFile;
-                //temp = dynamic_cast<RegularFile *>(elm); // #Şunlarda error check yap
                 SoftLinkedFile * obj = new SoftLinkedFile;
                 obj->setName(this->inputs[2]);
                 obj->setPath(this->currentDirectory->getPath());
@@ -452,21 +494,25 @@ namespace ShellKeskin
 
     void Shell::cd()
     {
-        //cout << this->inputs[1][0] << endl;
-        //cout << this->inputs[1] << endl;
+        Directory* temp_parent = currentDirectory;
         if(this->inputs.size() == 1)
         {
             this->currentDirectory = this->root;
             return ;
         }
         if(this->inputs[1] == "." || this->inputs[1] == "..")
-            this->cd_checkInputs();
+            this->cd_checkInputs(temp_parent);
         else
+        {
+            temp_parent = currentDirectory;
+            cout << temp_parent->getName() << " " << currentDirectory->getName() << endl;
             this->cd_checkPaths();
+            cout << temp_parent->getName() << " " << currentDirectory->getName() << endl;
+        }
     }
 
-    // #parentDirectory kullan
-    void Shell::cd_checkInputs()
+
+    void Shell::cd_checkInputs(Directory* temp_parent)
     {
         if(this->inputs[1] == ".")
             return ;
@@ -479,69 +525,22 @@ namespace ShellKeskin
             }
             if(currentDirectory->getParent() == root)
             {
-                this->currentDirectory = root;
+                this->currentDirectory = this->root;
+                cout << "1CurDir: " << currentDirectory->getName() << endl;
                 return;
             }
-            for(const auto& elm : this->root->getElements())
+            for(auto elm : this->root->getElements())
             {
                 if(dynamic_cast<Directory*>(elm))
                 {
-                    if(dynamic_cast<Directory*>(elm) == this->currentDirectory->getParent())
+                    if(dynamic_cast<Directory*>(elm) == temp_parent)
                     {
-                        this->currentDirectory = dynamic_cast<Directory*>(elm);
-                        return;
+                        this->currentDirectory = dynamic_cast<Directory*>(elm)->getParent();
+                        return ;
                     }
                 }
             }
         }
-
-        //cout << "NOLİYA1" << endl;
-        //if(this->inputs[1] == ".")
-        //{
-        //    cout << "NOLİYA2" << endl;
-        //    return ;
-        //}
-        //else if(this->inputs[1] == "..")
-        //{
-        //    cout << "NOLİYA3" << endl;
-        //    if(this->currentDirectory == this->root)
-        //    {
-        //        cout << "NOLİYA4" << endl;
-        //        throw runtime_error("You are in the root path!\n");
-        //        return ;
-        //    }
-        //    else if(this->currentDirectory->getParent()->getPath() == this->root->getPath())
-        //    {
-        //        cout << "NOLİYA5" << endl;
-        //        cout << currentDirectory->getName() << endl;
-        //        cout << currentDirectory->getParent()->getName() << endl;
-        //        this->currentDirectory = this->root;
-        //        return ;
-        //    }
-        //    else
-        //    {
-        //        for(const auto &elm : this->root->getElements())
-        //        {
-        //             cout << "NOLİYA6" << endl;
-//
-        //            if(dynamic_cast<Directory*>(elm))
-        //            {
-        //                cout << "NOLİYA7" << endl;
-//
-        //                if(dynamic_cast<Directory*>(elm)->getParent() == this->currentDirectory->getParent())
-        //                {
-        //                    cout << "NOLİYA8" << endl;
-        //                    cout << currentDirectory->getName() << endl;
-        //                    cout << currentDirectory->getParent()->getName() << endl;
-        //                    Directory *ptr = dynamic_cast<Directory*>(elm);
-        //                    this->currentDirectory = this->currentDirectory->getParent();
-        //                    return ;
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-        //return ;
         return ;
     }
 
@@ -550,6 +549,33 @@ namespace ShellKeskin
     {
         for(auto elm : this->root->getElements())
         {
+            //cout << "(CD_CHECK_PATHS) ELM name: " << elm->getName() << "  (CD_CHECK_PATHS) ELM path: " << elm->getPath() << endl;
+            //cout << "(CD_CHECK_PATHS) CHECKING : " << elm->getPath().substr(0,elm->getPath().find_last_not_of("/") + 1) << endl; 
+
+            if(this->inputs[1] == elm->getName())
+            {
+                if(dynamic_cast<Directory*>(elm))
+                {
+                    if(currentDirectory == root)
+                    {
+                        if((dynamic_cast<Directory*>(elm)->getPath() == root->getPath() + dynamic_cast<Directory*>(elm)->getName()))
+                        {
+                            this->currentDirectory = dynamic_cast<Directory*>(elm);
+                            cout << "CurDir: " << currentDirectory->getName() << endl;
+                            return ;
+                        }
+                    }
+                    else
+                    {
+                        if((dynamic_cast<Directory*>(elm)->getPath() == currentDirectory->getPath() + "/" + dynamic_cast<Directory*>(elm)->getName()))
+                        {
+                            this->currentDirectory = dynamic_cast<Directory*>(elm);
+                            cout << "CurDir: " << currentDirectory->getName() << endl;
+                            return ;
+                        }
+                    }
+                }
+            }
             if(this->inputs[1][0] == '/')
             {
                 ////for(const auto &elm : this->paths)
@@ -576,22 +602,7 @@ namespace ShellKeskin
                 //    }
                 //}
             }
-            if(this->inputs[1] == elm->getName() && dynamic_cast<Directory*>(elm))
-            {
-                if(elm->getPath() == currentDirectory->getPath())
-                {
-                    cout << this->currentDirectory->getPath() << " " << this->currentDirectory->getName() << endl;
-                    this->currentDirectory = dynamic_cast<Directory*>(elm);
-                    cout << this->currentDirectory->getPath() << " " << this->currentDirectory->getName() << endl;
-                    return ;
-                }
-                else
-                {
-                    throw invalid_argument("Error!\n");
-                }
-            }
         }
-        return ;
     }
 
     void Shell::cat()
