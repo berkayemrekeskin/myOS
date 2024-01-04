@@ -10,12 +10,13 @@ namespace FileSystemKeskin
     SoftLinkedFile::SoftLinkedFile() : File("ft_linked") {}
     SoftLinkedFile::SoftLinkedFile(string name, string path, string type, string linkedName) : File(name,path,type), linkedFileName(linkedName) { this->printToSystem(); }
 
-    SoftLinkedFile::SoftLinkedFile(const SoftLinkedFile &oth) : File(oth), linkedFileName(oth.linkedFileName)
+    SoftLinkedFile::SoftLinkedFile(const SoftLinkedFile &oth) : File(oth), linkedFileName(oth.linkedFileName), linkedRegular(oth.linkedRegular)
     { /* #pointer olaylarını shellde yap*/ }
     SoftLinkedFile & SoftLinkedFile::operator=(const SoftLinkedFile &oth)
     {
         File::operator=(oth);
         linkedFileName = oth.linkedFileName;
+        linkedRegular = oth.linkedRegular;
         return *this;
     }
     SoftLinkedFile::~SoftLinkedFile() {} 
@@ -34,7 +35,7 @@ namespace FileSystemKeskin
             throw invalid_argument("OS cannot open!\n");
         }
         //string sizeString = to_string(linkedRegular->getSize());
-        os <<  linkedFileName << endl; //<< " " << sizeString << endl; //Print linkedFile's name and size
+        os << linkedFileName << endl; //<< " " << sizeString << endl; //Print linkedFile's name and size
         os.close();
     }
     void SoftLinkedFile::readFromSystem(int &lineCounter)

@@ -16,14 +16,13 @@ using namespace std;
 
 namespace FileSystemKeskin
 {
-
     class File
     {
         public: 
 
             File(string _type);
             File(string name, string path, string type);
-            virtual ~File();    
+            virtual ~File() = 0;    
 
             virtual void printToSystem(); //Saving to the OS
             virtual void readFromSystem(int &line) = 0; //Reading from the OS
@@ -114,8 +113,8 @@ namespace FileSystemKeskin
             };
             
         private:
-            string linkedFileName;
             RegularFile *linkedRegular;
+            string linkedFileName;
     };
 
     class Directory : public File
@@ -135,6 +134,8 @@ namespace FileSystemKeskin
             //void fileToVector(strinag filePath);
             void addElements(File *elm);
             vector<File *> getElements() const;
+            void setParent(Directory* parent);
+            Directory* getParent() const;
             //void removeElements();
 
             //Iterator Class
@@ -148,7 +149,9 @@ namespace FileSystemKeskin
             };
 
         private:
+            Directory * parentDirectory;
             vector<File *> elements;
+
     };
 
     template<typename T> 

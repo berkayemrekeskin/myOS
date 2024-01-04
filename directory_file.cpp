@@ -97,16 +97,19 @@ namespace FileSystemKeskin
         }
         cout << endl;
     }
-    vector<File *> Directory::getElements() const
-    {
-        return this->elements;
-    }
-    //void Directory::fileToVector(string filePath) //CP
-    //{
-    //}
-
     void Directory::addElements(File * obj)
     {
         this->elements.push_back(obj);
     }
+
+    vector<File *> Directory::getElements() const
+    {
+        return this->elements;
+    }
+
+    void Directory::setParent(Directory* parent) { this->parentDirectory = parent; }
+    Directory* Directory::getParent() const { return this->parentDirectory; }
+
+
+
 }

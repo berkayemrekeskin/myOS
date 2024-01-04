@@ -1,5 +1,5 @@
-#ifndef SHELL_HPP
-#define SHELL_HPP
+#ifndef TEMP_SHELL_HPP
+#define TEMP_SHELL_HPP
 
 
 #include "files.hpp"
