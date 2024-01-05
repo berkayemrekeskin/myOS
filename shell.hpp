@@ -20,7 +20,7 @@ namespace ShellKeskin
             void splitLine(const string &input, vector<string> &vect);
             void checkInput();
             //Element add & delete
-            void addToOS(Directory *path);
+            void addToOS();
             void addToOSRecursive(Directory *path);
             void addToRoot(File* obj);
             void addToFolders();
@@ -31,7 +31,7 @@ namespace ShellKeskin
             const string absolutePath(const File *obj) const;
             //Commands
             void ls(Directory *current); // #pathleri kontrol et, cur.path ile aynıysa isimleri printle
-            void lsRecursive(const Directory *path, bool &isOver); // #currentpathden pathVectorün son elemanına kadar(en uzunu) her pathe gelince elemanlarını printle (path ismiyle birlikte)
+            void lsRecursive(const Directory *path); // #currentpathden pathVectorün son elemanına kadar(en uzunu) her pathe gelince elemanlarını printle (path ismiyle birlikte)
             void lsPrint(const Directory *path);            
             void recursivePrint(const Directory *current);
             void mkdir();   // #yeni bir directory obj oluştur, filesysteme pushla, myOS yazdır

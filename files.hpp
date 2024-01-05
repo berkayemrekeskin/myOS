@@ -130,7 +130,6 @@ namespace FileSystemKeskin
             virtual void readFromSystem(int &line) override;
             virtual void showContents() const override;
 
-
             //void fileToVector(strinag filePath);
             void addElements(File *elm);
             vector<File *> getElements() const;

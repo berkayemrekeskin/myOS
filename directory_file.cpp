@@ -51,14 +51,14 @@ namespace FileSystemKeskin
             throw invalid_argument("OS cannot open!\n");
         }
         os << endl;
-        if(!elements.empty())
-        {
-            for(auto elm : this->elements)
-            {
-                os << elm->getName() << " ";    //Printing the elements in the directory
-            }
-            os << '\n';
-        }
+        //if(!elements.empty())
+        //{
+        //    for(auto elm : this->elements)
+        //    {
+        //        os << elm->getName() << " ";    //Printing the elements in the directory
+        //    }
+        //    os << '\n';
+        //}
         
         os.close();
     }
@@ -97,6 +97,9 @@ namespace FileSystemKeskin
         }
         cout << endl;
     }
+
+
+
     void Directory::addElements(File * obj)
     {
         this->elements.push_back(obj);
