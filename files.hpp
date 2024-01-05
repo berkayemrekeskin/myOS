@@ -6,13 +6,8 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <chrono> // #belki cpp11 le olmayabilir kontrol et
+#include <chrono>
 using namespace std;
-
-/*TODO*/
-/*
-
-*/
 
 namespace FileSystemKeskin
 {
@@ -82,7 +77,7 @@ namespace FileSystemKeskin
             };
         private:
             size_t size;
-            vector<string> data; //#datayı line line al (if data[i][data[i].length()-1] == '$' end reading)
+            vector<string> data;
     };
     class SoftLinkedFile : public File
     {
@@ -163,7 +158,6 @@ namespace FileSystemKeskin
         }
         return false;
     }
-
 }
 
 #endif //FILES.HPP

@@ -116,6 +116,4 @@ namespace FileSystemKeskin
     }
     Directory* Directory::getParent() const { return this->parentDirectory; }
 
-
-
 }

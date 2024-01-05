@@ -1,7 +1,8 @@
-ft_directory /test test Fri Jan  5 11:12:41 2024 
-ft_directory /test/test1 test1 Fri Jan  5 11:12:45 2024 
-ft_directory /test/test1/test2 test2 Fri Jan  5 11:12:49 2024
-ft_regular /test/test1/file file Fri Jan  5 12:52:04 2024 140288
+ft_directory /dir1 dir1 Fri Jan  5 14:49:18 2024 
+ft_directory /dir1/dir2 dir2 Fri Jan  5 14:49:23 2024 
+ft_directory /dir1/dir2/dir3 dir3 Fri Jan  5 14:49:28 2024
+
+ft_regular /dir1/file file Fri Jan  5 14:58:25 2024 140288
 /*
 
     ##CLASSES:

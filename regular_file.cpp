@@ -1,12 +1,8 @@
 #include "files.hpp"
 using namespace std;
 /*------------------------------------ REGULAR FILE CLASS IMPLEMENTATION ------------------------------------*/
-/*DIFFERS*/
-//SIZE_T SIZE
-//STRING VECTOR DATA
 namespace FileSystemKeskin
 {
-        //CONSTRUCTORS & OVERLOADS
     RegularFile::RegularFile() : File("ft_regular"), size(0) {/*Default is enough*/}
     RegularFile::RegularFile(string name, string path, string type) : File(name,path,type), size(0) { this->printToSystem(); }
 
@@ -36,8 +32,6 @@ namespace FileSystemKeskin
         return *this;
     }
     RegularFile::~RegularFile() {}
-    
-
         //GETTERS & SETTERS,
     const size_t RegularFile::getSize() const {return size;}
 
@@ -127,8 +121,6 @@ namespace FileSystemKeskin
             }
         }
     }
-    //#just copies to the vector (handle the file(OSKEskin.txt) problem somewhere another)
-    //#kendi OSime printlerken $ unutma vectorde $ yok
     void RegularFile::fileToVector(string filePath) //CP
     {
         ifstream OSFile(filePath);
@@ -142,7 +134,6 @@ namespace FileSystemKeskin
         {
             data.push_back(line);
         }
-        this->printToSystem(); //# bunu bi düzenle sıkıntı çıkarabilir
         OSFile.close();
     }
 }
