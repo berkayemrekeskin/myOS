@@ -19,9 +19,9 @@ namespace FileSystemKeskin
             virtual void showContents() const override;
 
             void setPointer(RegularFile *obj);
-            void setLinkedName(const string &name);
+            void setLinkedPath(const string &path);
             RegularFile * getPointer() const;
-            const string getLinkedName() const;
+            const string getLinkedPath() const;
 
             //Iterator Class
             class Iterator
@@ -35,7 +35,7 @@ namespace FileSystemKeskin
             
         private:
             RegularFile *linkedRegular;
-            string linkedFileName;
+            string linkedFilePath;
     };
 }
 

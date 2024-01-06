@@ -3,29 +3,16 @@
 using namespace std;
 
 /*------------------------------------ LINKED FILE CLASS IMPLEMENTATION ------------------------------------*/
-/*DIFFERS*/
-//PTR TO REGULAR FILE
 namespace FileSystemKeskin
 {
 //BUNUN CONSTRUCTORLARI FALAN FULL DEĞİŞMELİ POINTERIN ÖZELLİKLERİNİ TUTMALI
     SoftLinkedFile::SoftLinkedFile() : File("ft_linked") {}
-    SoftLinkedFile::SoftLinkedFile(string name, string path, string type, string linkedName) : File(name,path,type), linkedFileName(linkedName) { this->printToSystem(); }
+    SoftLinkedFile::SoftLinkedFile(string name, string path, string type, string linkedPath) : File(name,path,type), linkedFilePath(linkedPath) { this->printToSystem(); }
 
-    //SoftLinkedFile::SoftLinkedFile(const SoftLinkedFile &oth) : File(oth), linkedFileName(oth.linkedFileName), linkedRegular(oth.linkedRegular)
-    //{ /* #pointer olaylarını shellde yap*/ }
-    //SoftLinkedFile & SoftLinkedFile::operator=(const SoftLinkedFile &oth)
-    //{
-    //    File::operator=(oth);
-    //    linkedFileName = oth.linkedFileName;
-    //    linkedRegular = oth.linkedRegular;
-    //    return *this;
-    //}
-    //SoftLinkedFile::~SoftLinkedFile() { } 
-
-    void SoftLinkedFile::setLinkedName(const string &name) { this->linkedFileName = name; }
+    void SoftLinkedFile::setLinkedPath(const string &path) { this->linkedFilePath = path; }
     void SoftLinkedFile::setPointer(RegularFile *obj) { this->linkedRegular = obj; } 
     RegularFile * SoftLinkedFile::getPointer() const { return this->linkedRegular; }
-    const string SoftLinkedFile::getLinkedName() const { return this->linkedFileName; }
+    const string SoftLinkedFile::getLinkedPath() const { return this->linkedFilePath; }
 
     void SoftLinkedFile::printToSystem()  
     {
@@ -35,8 +22,14 @@ namespace FileSystemKeskin
         {
             throw invalid_argument("OS cannot open!\n");
         }
-        //string sizeString = to_string(linkedRegular->getSize());
-        os << linkedFileName << endl; //<< " " << sizeString << endl; //Print linkedFile's name and size
+        if(linkedRegular != nullptr)
+        {
+            os << linkedFilePath << " " << linkedRegular->getSize() << endl; //Print linkedFile's name and size
+        }
+        else
+        {
+            os << "RegularRemoved" << " " << "0" << endl;
+        }
         os.close();
     }
     void SoftLinkedFile::readFromSystem(int &lineCounter)
@@ -63,7 +56,7 @@ namespace FileSystemKeskin
         this->setName(subStrings[2]);
         _time = subStrings[3] + " " + subStrings[4] + " " + subStrings[5] + " " + subStrings[6] + " " + subStrings[7]; //Concatanating the time substrings
         this->setTime(_time);
-        this->linkedFileName = subStrings[8];
+        this->linkedFilePath = subStrings[8];
 
         os.close();
     }

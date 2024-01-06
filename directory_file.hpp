@@ -28,14 +28,36 @@ namespace FileSystemKeskin
             //void removeElements();
 
             //Iterator Class
-            class Iterator
+            class iterator
             {
                 public:
-                    Iterator(File *fptr) : ptr(fptr) {}
-                    //...
+                    iterator(File* ptr) : current(ptr) {}
+                    File& operator*() const { return *current; }
+                    iterator& operator++() 
+                    {
+                        ++current;
+                        return *this;
+                    }
+                    iterator operator++(int)
+                    {
+                        File* temp = current;
+                        ++current;
+                        return iterator(temp);
+                    }
+                    bool operator==(const iterator& oth) const { return current == oth.current; }
+                    bool operator!=(const iterator& oth) const { return current != oth.current; }
+
                 private:
-                    File * ptr;
+                    File* current;
             };
+            const iterator begin() const
+            {
+                return iterator(elements[0]);
+            }
+            const iterator end() const
+            {
+                return iterator(elements[elements.size()]);
+            }
 
         private:
             Directory * parentDirectory;

@@ -72,7 +72,7 @@ namespace ShellKeskin
                 obj->readFromSystem(lineCounter);
                 for(auto elm : this->files->getElements())
                 {
-                    if(elm->getName() == obj->getLinkedName())
+                    if(elm->getPath() == obj->getLinkedPath())
                     {
                         obj->setPointer(dynamic_cast<RegularFile*>(elm));
                         break;
@@ -159,11 +159,7 @@ namespace ShellKeskin
                     else if(elm->getType() == "ft_linked")
                     {
                         SoftLinkedFile * obj = dynamic_cast<SoftLinkedFile *>(elm);
-                        //#okurken pointer yanlış adres tutuyor çöz onu
-                        //cout << obj << endl;
-                        //cout << dynamic_cast<SoftLinkedFile *>(elm) << " ";
-                        //cout << dynamic_cast<SoftLinkedFile *>(elm)->getPointer()  << " " << obj->getPointer() << endl;
-                        cout << "F " << obj->getName() << "        " << obj->getTime() << "        " << obj->getPointer() << endl;
+                        cout << "L " << obj->getName() << "        " << obj->getTime() << "        " << obj->getPointer()->getSize() << endl;
                     }
             }
         }
@@ -245,6 +241,7 @@ namespace ShellKeskin
                         {
                             if(elm != removed)
                             {
+                                cout << elm->getName() << endl;
                                 temp_files.push_back(elm);
                             }
                         }
@@ -253,17 +250,28 @@ namespace ShellKeskin
                         {
                             if(elm != removed)
                             {
+                                cout << elm->getName() << endl;
                                 temp_parent.push_back(elm);
                             }
                         }
                         this->files->setElements(temp_files);
                         this->currentDirectory->setElements(temp_parent);
+
+                        for(auto elm : this->files->getElements())
+                        {
+                            cout << " - " << elm->getName() << endl;
+                        }
+                        for(auto elm : this->currentDirectory->getElements())
+                        {
+                            cout << " --- " << elm->getName() << endl;
+                        }
                         remove("OSKeskin.txt");
                         this->addToOS();
                         break;
                     }
                 }
             }
+
         }
     }
     /*----------------------------------------- (CP) -----------------------------------------*/
@@ -281,6 +289,7 @@ namespace ShellKeskin
                     newDirectory->setParent(currentDirectory);
                     newDirectory->printToSystem();
                     cp_directory(newDirectory,dynamic_cast<Directory*>(elm));
+                    this->files->addElements(newDirectory);
                     currentDirectory->addElements(newDirectory);
                     return ;
                 }
@@ -301,7 +310,7 @@ namespace ShellKeskin
                     copiedFile->setData(dynamic_cast<RegularFile*>(elm)->getData());
                     copiedFile->printToSystem();
                     files->addElements(copiedFile);
-                    if(currentDirectory != files)
+                    if(currentDirectory != rootDirectory)
                         currentDirectory->addElements(copiedFile);
                     return ;
                 }
@@ -397,7 +406,7 @@ namespace ShellKeskin
                     SoftLinkedFile * obj = new SoftLinkedFile;
                     obj->setName(this->inputs[2]);
                     obj->setPath(absolutePath(obj,currentDirectory));
-                    obj->setLinkedName(elm->getName());
+                    obj->setLinkedPath(elm->getPath());
                     obj->setPointer(dynamic_cast<RegularFile*>(elm));
                     obj->printToSystem();
                     this->addToFiles(obj);
@@ -462,47 +471,64 @@ namespace ShellKeskin
     }
     void Shell::cd_checkPaths()
     {
-        for(auto elm : this->files->getElements())
+        if(this->inputs[1][0] == '/')
         {
-            if(this->inputs[1] == elm->getName())
+            for(const auto &elm : this->files->getElements())
             {
                 if(dynamic_cast<Directory*>(elm))
                 {
-                    if(elm->getPath() == absolutePath(elm,this->currentDirectory))
+                    if(elm->getPath() == inputs[1])
                     {
                         this->currentDirectory = dynamic_cast<Directory*>(elm);
-                            return ;
+                        return ;
                     }
                 }
             }
-            if(this->inputs[1][0] == '/')
+        }
+        else
+        {
+            for(auto elm : this->files->getElements())
             {
-                for(const auto &elm : this->files->getElements())
+                if(this->inputs[1] == elm->getName())
                 {
                     if(dynamic_cast<Directory*>(elm))
                     {
-                        if(dynamic_cast<Directory*>(elm)->getPath() == inputs[1])
+                        cout << elm->getPath() << " " << absolutePath(elm,this->currentDirectory) << endl;
+                        if(elm->getPath() == absolutePath(elm,this->currentDirectory))
                         {
                             this->currentDirectory = dynamic_cast<Directory*>(elm);
-                            return ;
+                                return ;
                         }
                     }
                 }
             }
         }
+        
     }
     /*----------------------------------------- (CAT) -----------------------------------------*/
     void Shell::cat()
     {
         for(auto elm : this->currentDirectory->getElements())
         {
-            if(this->inputs[1] == elm->getName() && elm->getPath() == absolutePath(elm,this->currentDirectory))
+            if(this->inputs[1][0] != '/')
+            {
+                if(this->inputs[1] == elm->getName() && elm->getPath() == absolutePath(elm,currentDirectory))
                 {
                     elm->showContents();
                     return ;
                 }
+            }
+            else
+            {
+                if(this->inputs[1] == elm->getPath())
+                {
+                    elm->showContents();
+                    return ;
+                }
+            }
         }
     }
+    /*----------------------------------------- (HELPERS) -----------------------------------------*/
     const string Shell::absolutePath(const File* obj, const Directory* current) const
     {
         if(current == rootDirectory)
