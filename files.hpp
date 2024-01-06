@@ -65,7 +65,9 @@ namespace FileSystemKeskin
 
             void fileToVector(string filePath);
             const size_t getSize() const;
-
+            void setData(const vector<string> &data);
+            const vector<string> getData() const;
+            
             //Iterator Class
             class Iterator
             {
@@ -128,6 +130,7 @@ namespace FileSystemKeskin
             //void fileToVector(strinag filePath);
             void addElements(File *elm);
             vector<File *> getElements() const;
+            void setElements(const vector<File*> &other);
             void setParent(Directory* parent);
             Directory* getParent() const;
             //void removeElements();

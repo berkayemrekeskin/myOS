@@ -39,8 +39,8 @@ namespace FileSystemKeskin
         {
             delete elm;
         }
+        delete parentDirectory;
     }
-
 
     void Directory::printToSystem() 
     {
@@ -51,15 +51,6 @@ namespace FileSystemKeskin
             throw invalid_argument("OS cannot open!\n");
         }
         os << endl;
-        //if(!elements.empty())
-        //{
-        //    for(auto elm : this->elements)
-        //    {
-        //        os << elm->getName() << " ";    //Printing the elements in the directory
-        //    }
-        //    os << '\n';
-        //}
-        
         os.close();
     }
     void Directory::readFromSystem(int &lineCounter)
@@ -98,8 +89,6 @@ namespace FileSystemKeskin
         cout << endl;
     }
 
-
-
     void Directory::addElements(File * obj)
     {
         this->elements.push_back(obj);
@@ -110,10 +99,17 @@ namespace FileSystemKeskin
         return this->elements;
     }
 
+    void Directory::setElements(const vector<File*> &other)
+    {
+        this->elements = other;
+    }
+
     void Directory::setParent(Directory* parent) 
     {
         this->parentDirectory = parent; 
     }
     Directory* Directory::getParent() const { return this->parentDirectory; }
+
+
 
 }

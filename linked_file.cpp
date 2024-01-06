@@ -19,7 +19,7 @@ namespace FileSystemKeskin
         linkedRegular = oth.linkedRegular;
         return *this;
     }
-    SoftLinkedFile::~SoftLinkedFile() {} 
+    SoftLinkedFile::~SoftLinkedFile() { delete this->linkedRegular; } 
 
     void SoftLinkedFile::setLinkedName(const string &name) { this->linkedFileName = name; }
     void SoftLinkedFile::setPointer(RegularFile *obj) { this->linkedRegular = obj; } 

@@ -34,9 +34,9 @@ namespace FileSystemKeskin
     RegularFile::~RegularFile() {}
         //GETTERS & SETTERS,
     const size_t RegularFile::getSize() const {return size;}
+    void RegularFile::setData(const vector<string> &newData) { this->data = newData; }
+    const vector<string> RegularFile::getData() const { return this->data; }
 
-        //GENERAL FUNCTIONS
-            //VIRTUAL FUNCTIONS
     void RegularFile::printToSystem() {
         
         File::printToSystem();
@@ -50,10 +50,11 @@ namespace FileSystemKeskin
         {
             for(auto line : data)
             {
-                size += sizeof(line) * line.length();
+                size += sizeof(line);
             }
         }
         os << size << endl;
+        
         if(!data.empty())
         {
             for(auto line : data)
