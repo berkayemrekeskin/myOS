@@ -1,10 +1,13 @@
 #ifndef SHELL_HPP
 #define SHELL_HPP
 
-
 #include "files.hpp"
+#include "directory_file.hpp"
+
 using namespace std;
 using namespace FileSystemKeskin;
+
+#define MAX_SIZE = 100000
 
 namespace ShellKeskin
 {
@@ -21,7 +24,7 @@ namespace ShellKeskin
             void checkInput();
             //Element add & delete
             void addToOS();
-            void addToRoot(File* obj);
+            void addToFiles(File* obj);
             void addToFolders();
             void assignParents();
             //void removeElement();
@@ -43,25 +46,15 @@ namespace ShellKeskin
             void cd_checkPaths();
             void cat(); // eleman yazdır
 
-            //Iterator Class
-            class Iterator
-            {
-                public:
-                    Iterator(File *fptr) : ptr(fptr) {}
-                    //...
-                private:
-                    File * ptr;
-            };
 
         private:
-            Directory * currentDirectory; // #Anlık pathi tutar
-            Directory * root;
+            Directory* files;
+            Directory* currentDirectory; // #Anlık pathi tutar
+            Directory* rootDirectory;
+            size_t fileSize;
             vector<string> inputs;
     };
 
 }
-
-
-
 
 #endif

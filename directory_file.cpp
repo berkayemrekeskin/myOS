@@ -1,9 +1,8 @@
 #include "files.hpp"
+#include "directory_file.hpp"
 using namespace std;
 
 /*------------------ DIRECTORY CLASS IMPLEMENTATION ------------------*/
-/*DIFFERS*/
-//FILE * VECTOR
 namespace FileSystemKeskin
 {
         //CONSTRUCTORS & OVERLOADS

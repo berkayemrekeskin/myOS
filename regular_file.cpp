@@ -1,4 +1,5 @@
 #include "files.hpp"
+#include "regular_file.hpp"
 using namespace std;
 /*------------------------------------ REGULAR FILE CLASS IMPLEMENTATION ------------------------------------*/
 namespace FileSystemKeskin
@@ -6,32 +7,33 @@ namespace FileSystemKeskin
     RegularFile::RegularFile() : File("ft_regular"), size(0) {/*Default is enough*/}
     RegularFile::RegularFile(string name, string path, string type) : File(name,path,type), size(0) { this->printToSystem(); }
 
-    RegularFile::RegularFile(const RegularFile &oth) : File(oth), size(oth.size)
-    {
-        this->data.clear();
-        if(size != 0)
-        {
-            for(auto elm : oth.data)
-            {
-                this->data.push_back(elm);
-            }
-        }
-    }
-    RegularFile & RegularFile::operator=(const RegularFile &oth)
-    {
-        File::operator=(oth);
-        this->size = oth.size;
-        this->data.clear();
-        if(size != 0)
-        {
-            for(auto elm : oth.data)
-            {
-                this->data.push_back(elm);
-            }
-        }
-        return *this;
-    }
-    RegularFile::~RegularFile() {}
+    //RegularFile::RegularFile(const RegularFile &oth) : File(oth), size(oth.size)
+    //{
+    //    this->data.clear();
+    //    if(size != 0)
+    //    {
+    //        for(auto elm : oth.data)
+    //        {
+    //            this->data.push_back(elm);
+    //        }
+    //    }
+    //}
+    //RegularFile & RegularFile::operator=(const RegularFile &oth)
+    //{
+    //    File::operator=(oth);
+    //    this->size = oth.size;
+    //    this->data.clear();
+    //    if(size != 0)
+    //    {
+    //        for(auto elm : oth.data)
+    //        {
+    //            this->data.push_back(elm);
+    //        }
+    //    }
+    //    return *this;
+    //}
+    //RegularFile::~RegularFile() {}
+
         //GETTERS & SETTERS,
     const size_t RegularFile::getSize() const {return size;}
     void RegularFile::setData(const vector<string> &newData) { this->data = newData; }

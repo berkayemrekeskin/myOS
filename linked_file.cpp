@@ -1,4 +1,5 @@
 #include "files.hpp"
+#include "linked_file.hpp"
 using namespace std;
 
 /*------------------------------------ LINKED FILE CLASS IMPLEMENTATION ------------------------------------*/
@@ -10,16 +11,16 @@ namespace FileSystemKeskin
     SoftLinkedFile::SoftLinkedFile() : File("ft_linked") {}
     SoftLinkedFile::SoftLinkedFile(string name, string path, string type, string linkedName) : File(name,path,type), linkedFileName(linkedName) { this->printToSystem(); }
 
-    SoftLinkedFile::SoftLinkedFile(const SoftLinkedFile &oth) : File(oth), linkedFileName(oth.linkedFileName), linkedRegular(oth.linkedRegular)
-    { /* #pointer olaylarını shellde yap*/ }
-    SoftLinkedFile & SoftLinkedFile::operator=(const SoftLinkedFile &oth)
-    {
-        File::operator=(oth);
-        linkedFileName = oth.linkedFileName;
-        linkedRegular = oth.linkedRegular;
-        return *this;
-    }
-    SoftLinkedFile::~SoftLinkedFile() { delete this->linkedRegular; } 
+    //SoftLinkedFile::SoftLinkedFile(const SoftLinkedFile &oth) : File(oth), linkedFileName(oth.linkedFileName), linkedRegular(oth.linkedRegular)
+    //{ /* #pointer olaylarını shellde yap*/ }
+    //SoftLinkedFile & SoftLinkedFile::operator=(const SoftLinkedFile &oth)
+    //{
+    //    File::operator=(oth);
+    //    linkedFileName = oth.linkedFileName;
+    //    linkedRegular = oth.linkedRegular;
+    //    return *this;
+    //}
+    //SoftLinkedFile::~SoftLinkedFile() { } 
 
     void SoftLinkedFile::setLinkedName(const string &name) { this->linkedFileName = name; }
     void SoftLinkedFile::setPointer(RegularFile *obj) { this->linkedRegular = obj; } 
