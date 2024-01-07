@@ -6,7 +6,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <chrono>
+#include <ctime>
 using namespace std;
 
 namespace FileSystemKeskin
@@ -32,16 +32,6 @@ namespace FileSystemKeskin
             void setPath(const string &path);
             void setType(const string &type);
             void setTime(const string &time);
-
-            //Iterator Class
-            class Iterator
-            {
-                public:
-                    Iterator(string *fptr) : ptr(fptr) {}
-                    //...
-                private:
-                    string * ptr;
-            };
 
         private:
             string name;

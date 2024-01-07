@@ -1,7 +1,7 @@
 all: clean compile run
-compile: main.cpp files.cpp shell.cpp regular_file.cpp linked_file.cpp directory_file.cpp
-	@g++ -o os main.cpp files.cpp shell.cpp regular_file.cpp linked_file.cpp directory_file.cpp -std=c++11
+compile: src/main.cpp src/files.cpp src/shell.cpp src/regular_file.cpp src/linked_file.cpp src/directory_file.cpp
+	@g++ -o os src/main.cpp src/files.cpp src/shell.cpp src/regular_file.cpp src/linked_file.cpp src/directory_file.cpp -std=c++11 
 run:
-	@valgrind --leak-check=full ./os
+	@./os
 clean: 
 	@rm -f *.o

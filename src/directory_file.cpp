@@ -1,5 +1,5 @@
-#include "files.hpp"
-#include "directory_file.hpp"
+#include "../includes/files.hpp"
+#include "../includes/directory_file.hpp"
 using namespace std;
 
 /*------------------ DIRECTORY CLASS IMPLEMENTATION ------------------*/
@@ -34,7 +34,7 @@ namespace FileSystemKeskin
     }
     Directory::~Directory() 
     {
-        for(auto & elm : this->elements)
+        for(auto &elm : this->elements)
         {
             delete elm;
         }
@@ -81,11 +81,19 @@ namespace FileSystemKeskin
     }
     void Directory::showContents() const
     {
-        for(auto elm : this->elements)
+        if(!this->elements.empty())
         {
-            cout << elm->getName() << " ";
+            for(auto elm : this->elements)
+            {
+                cout << elm->getName() << " ";
+            }
+            cout << endl;
         }
-        cout << endl;
+        else
+        {
+            throw invalid_argument("cat: directory is empty!");
+        }
+        
     }
 
     void Directory::addElements(File * obj)
@@ -107,6 +115,7 @@ namespace FileSystemKeskin
     {
         this->parentDirectory = parent; 
     }
+    
     Directory* Directory::getParent() const { return this->parentDirectory; }
 
 

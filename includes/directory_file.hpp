@@ -1,7 +1,7 @@
 #ifndef DIRECTORY_FILE_HPP
 #define DIRECTORY_FILE_HPP
 
-#include "files.hpp"
+#include "../includes/files.hpp"
 using namespace std;
 
 namespace FileSystemKeskin
@@ -19,13 +19,11 @@ namespace FileSystemKeskin
             virtual void readFromSystem(int &line) override;
             virtual void showContents() const override;
 
-            //void fileToVector(strinag filePath);
             void addElements(File *elm);
             vector<File *> getElements() const;
             void setElements(const vector<File*> &other);
             void setParent(Directory* parent);
             Directory* getParent() const;
-            //void removeElements();
 
             //Iterator Class
             class iterator

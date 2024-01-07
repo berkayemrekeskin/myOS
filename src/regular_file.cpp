@@ -1,24 +1,32 @@
-#include "files.hpp"
-#include "regular_file.hpp"
+#include "../includes/files.hpp"
+#include "../includes/regular_file.hpp"
 using namespace std;
 /*------------------------------------ REGULAR FILE CLASS IMPLEMENTATION ------------------------------------*/
 namespace FileSystemKeskin
 {
     RegularFile::RegularFile() : File("ft_regular"), size(0) {/*Default is enough*/}
     RegularFile::RegularFile(string name, string path, string type) : File(name,path,type), size(0) { this->printToSystem(); }
-
-    const size_t RegularFile::getSize() const {return size;}
-    void RegularFile::setData(const vector<string> &newData) { this->data = newData; }
-    const vector<string> RegularFile::getData() const { return this->data; }
+    
+    size_t RegularFile::getSize() const {return size;}
+    vector<string> RegularFile::getData() const { return this->data; }
+    void RegularFile::setData(const vector<string> &newData) 
+    { 
+        this->data = newData; 
+        for(auto elm : this->data)
+            this->size += sizeof(elm);
+            
+    }
 
     void RegularFile::printToSystem() {
         
         File::printToSystem();
+
         this->size = 0;
+        
         ofstream os("OSKeskin.txt", std::ios::app);
         if(!os.is_open())
         {
-            throw invalid_argument("OS cannot open!\n");
+            throw invalid_argument("error: os cannot open!");
         }
         if(!data.empty())
         {
@@ -47,8 +55,9 @@ namespace FileSystemKeskin
         ifstream os("OSKeskin.txt");
         if(!os.is_open())
         {
-            throw invalid_argument("OS cannot open!\n");
+            throw invalid_argument("error: os cannot open!");
         }
+
         int index = 0;
         while(index != lineCounter) //Iterating through the line of the file
         {
@@ -77,12 +86,11 @@ namespace FileSystemKeskin
                     break;
                 }
                 data.push_back(line);
-               
             }
         }
         os.close();
     }
-    void RegularFile::showContents() const  //CAT
+    void RegularFile::showContents() const
     {   
         if(!data.empty())
         {
@@ -94,13 +102,17 @@ namespace FileSystemKeskin
                 }
             }
         }
+        else
+        {
+            throw runtime_error("cat: file is empty!");
+        }
     }
-    void RegularFile::fileToVector(string filePath) //CP
+    void RegularFile::fileToVector(string filePath)
     {
         ifstream OSFile(filePath);
         if(!OSFile.is_open())
         {
-            throw invalid_argument("Invalid file name!\n");
+            throw invalid_argument("cp: file not found!");
         }
         string line;
         this->data.clear();

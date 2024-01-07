@@ -1,5 +1,5 @@
-#include "files.hpp"
-#include "linked_file.hpp"
+#include "../includes/files.hpp"
+#include "../includes/linked_file.hpp"
 using namespace std;
 
 /*------------------------------------ LINKED FILE CLASS IMPLEMENTATION ------------------------------------*/
@@ -20,7 +20,7 @@ namespace FileSystemKeskin
         ofstream os("OSKeskin.txt", std::ios::app);
         if(!os.is_open())
         {
-            throw invalid_argument("OS cannot open!\n");
+            throw invalid_argument("error: os cannot open!");
         }
         if(linkedRegular != nullptr)
         {
@@ -41,7 +41,7 @@ namespace FileSystemKeskin
         ifstream os("OSKeskin.txt");
         if(!os.is_open())
         {
-            throw invalid_argument("OS cannot open!\n");
+            throw invalid_argument("error: os cannot open!");
         }
         int index = 0;
         while(index != lineCounter) //Iterating through the line of the file
@@ -68,7 +68,7 @@ namespace FileSystemKeskin
         }
         else
         {
-            throw runtime_error("File is empty\n");
+            throw runtime_error("cat: file is empty!");
         }
     }
 }
