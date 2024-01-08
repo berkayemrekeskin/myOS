@@ -222,25 +222,42 @@ namespace ShellKeskin
         int len_of_path = absolutePath(removed,currentDirectory).length();
         vector<File*> files_others;
         vector<File*> current_others;
+        
         for(auto elm : this->files->getElements())
         {
+            cout << "f: "<<elm->getPath().substr(0,len_of_path) << " " << elm->getPath() << endl;
             if(elm->getPath().substr(0,len_of_path) != absolutePath(removed,currentDirectory))
             {
+                cout << "FILES: "<< elm->getName() << endl;
                 files_others.push_back(elm);
             }
         }
         for(auto elm : this->currentDirectory->getElements())
         {
+            cout << "c: "<<  elm->getPath().substr(0,len_of_path) << " " << elm->getPath() << endl;
             if(elm->getPath().substr(0,len_of_path) != absolutePath(removed,currentDirectory))
             {
+                cout << "CURRENT: "<< elm->getName() << endl;
                 current_others.push_back(elm);
             }
+            else
+            {
+                delete elm;
+            }
         }
+        for(auto elm : files_others)
+            cout << "FF: " <<elm->getName() << " ";
+        for(auto elm : current_others)
+            cout << "CC: " <<elm->getName() << " ";
+        cout << endl;
+
         this->files->setElements(files_others);
         this->currentDirectory->setElements(current_others);
+
         remove("OSKeskin.txt");
         addToOS();
     }
+
     /*----------------------------------------- (RM) -----------------------------------------*/
     void Shell::rm()
     {
@@ -285,6 +302,7 @@ namespace ShellKeskin
                         }
                         this->files->setElements(temp_files);
                         this->currentDirectory->setElements(temp_parent);
+                        delete removed;
 
                         remove("OSKeskin.txt");
                         this->addToOS();

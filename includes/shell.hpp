@@ -39,7 +39,8 @@ namespace ShellKeskin
             
             void mkdir();   // #yeni bir directory obj oluştur, filesysteme pushla, myOS yazdır
             void rmdir(Directory* removed); // if mkdir gets input that os has, then delete that folder with its elements recurively
-            
+            void rmdirRecursive(Directory* current);
+
             void rm(); // #adı girilen fileı filesystemde bul, filesystemden sil, filesystemi en baştan myOS yazdır silinmiş haliyle yazılsın
             
             void cp(); // #file adını al, regularFile obj oluştur, fileTOVector kullan, filesysteme pushla, myOS yazdır
