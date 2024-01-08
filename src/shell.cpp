@@ -49,7 +49,6 @@ namespace ShellKeskin
         while(getline(os,line))
             totalLine++;
         os.close();
-
         //Read from the file & add to files
         os.open("OSKeskin.txt");
         if(!os.is_open())
@@ -228,6 +227,7 @@ namespace ShellKeskin
         this->files->removeFile(file);
             if(file != nullptr)
                 current->removeFile(file);
+        this->fileSize -= dynamic_cast<RegularFile*>(file)->getSize();
     }
     void Shell::rmdir(File *file, Directory* current) // Remove directories
     {
@@ -249,6 +249,7 @@ namespace ShellKeskin
             this->files->removeFile(file);
             if(file != nullptr)
                 current->removeFile(file);
+            this->fileSize -= dynamic_cast<RegularFile*>(file)->getSize();
         }
     }
     /*----------------------------------------- (RM) -----------------------------------------*/
@@ -294,8 +295,9 @@ namespace ShellKeskin
                         //Delete the file
                         this->files->setElements(temp_files);
                         this->currentDirectory->setElements(temp_parent);
-                        delete removed;
+                        this->fileSize -= dynamic_cast<RegularFile*>(removed)->getSize();
 
+                        delete removed;
                         remove("OSKeskin.txt");
                         this->addToOS();
                         break;
