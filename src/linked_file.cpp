@@ -7,7 +7,6 @@ namespace FileSystemKeskin
 {
 //BUNUN CONSTRUCTORLARI FALAN FULL DEĞİŞMELİ POINTERIN ÖZELLİKLERİNİ TUTMALI
     SoftLinkedFile::SoftLinkedFile() : File("ft_linked") {}
-    SoftLinkedFile::SoftLinkedFile(string name, string path, string type, string linkedPath) : File(name,path,type), linkedFilePath(linkedPath) { this->printToSystem(); }
 
     void SoftLinkedFile::setLinkedPath(const string &path) { this->linkedFilePath = path; }
     void SoftLinkedFile::setPointer(RegularFile *obj) { this->linkedRegular = obj; } 
@@ -17,6 +16,7 @@ namespace FileSystemKeskin
     void SoftLinkedFile::printToSystem()  
     {
         File::printToSystem();
+        
         ofstream os("OSKeskin.txt", std::ios::app);
         if(!os.is_open())
         {

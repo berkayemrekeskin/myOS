@@ -10,23 +10,22 @@ namespace FileSystemKeskin
     {
         public:
             RegularFile();
-            RegularFile(string name, string path, string type);
-
+            
             virtual void printToSystem() override;
             virtual void readFromSystem(int &line) override;
             virtual void showContents() const override;
 
             void fileToVector(string filePath);
+
             size_t getSize() const;
-            void setData(const vector<string> &data);
             vector<string> getData() const;
+            void setData(const vector<string> &data);
             
             //Iterator Class
-            /*
             class iterator
             {
                 public:
-                    iterator(string* ptr) : current(ptr) {}
+                    iterator(vector<string>::iterator ptr) : current(ptr) {}
                     string& operator*() const { return *current; }
                     iterator& operator++() 
                     {
@@ -35,24 +34,25 @@ namespace FileSystemKeskin
                     }
                     iterator operator++(int)
                     {
-                        string* temp = current;
+                        vector<string>::iterator temp = current;
                         ++current;
                         return iterator(temp);
                     }
                     bool operator==(const iterator& oth) const { return current == oth.current; }
                     bool operator!=(const iterator& oth) const { return current != oth.current; }
+
                 private:
-                    string* current;
+                    vector<string>::iterator current;
             };
-            iterator begin() const
+            const iterator begin() const
             {
-                return iterator(data.begin());
+                return iterator(this->getData().begin());
             }
-            iterator end() const
+            const iterator end() const
             {
-                return iterator(data.end());
+                return iterator(this->getData().end());
             }
-            */
+            
         private:
             size_t size;
             vector<string> data;

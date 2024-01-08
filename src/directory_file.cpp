@@ -5,41 +5,13 @@ using namespace std;
 /*------------------ DIRECTORY CLASS IMPLEMENTATION ------------------*/
 namespace FileSystemKeskin
 {
-        //CONSTRUCTORS & OVERLOADS
     Directory::Directory() : File("ft_directory") {}
-    Directory::Directory(string name, string path, string type) : File(name,path,type) { this->printToSystem(); }
-    Directory::Directory(const Directory &oth) : File(oth)
-    {
-        this->elements.clear();
-        if(!oth.elements.empty())
-        {
-            for(auto elm : oth.elements)
-            {
-                this->elements.push_back(elm);
-            }
-        }
-    }
-    Directory & Directory::operator=(const Directory &oth)
-    {
-        File::operator=(oth);
-        this->elements.clear();
-        if(!oth.elements.empty())
-        {
-            for(auto elm : oth.elements)
-            {
-                this->elements.push_back(elm);
-            }
-        }
-        return *this;
-    }
-    Directory::~Directory() 
-    {
-        for(auto &elm : this->elements)
-        {
-            delete elm;
-        }
-        delete parentDirectory;
-    }
+
+    void Directory::addElements(File * obj) { this->elements.push_back(obj); }
+    void Directory::setElements(const vector<File*> &other) { this->elements = other; }
+    void Directory::setParent(Directory* parent) { this->parentDirectory = parent; }
+    vector<File *> Directory::getElements() const { return this->elements; }
+    Directory* Directory::getParent() const { return this->parentDirectory; }
 
     void Directory::printToSystem() 
     {
@@ -93,31 +65,5 @@ namespace FileSystemKeskin
         {
             throw invalid_argument("cat: directory is empty!");
         }
-        
     }
-
-    void Directory::addElements(File * obj)
-    {
-        this->elements.push_back(obj);
-    }
-
-    vector<File *> Directory::getElements() const
-    {
-        return this->elements;
-    }
-
-    void Directory::setElements(const vector<File*> &other)
-    {
-        this->elements = other;
-    }
-
-    void Directory::setParent(Directory* parent) 
-    {
-        this->parentDirectory = parent; 
-    }
-    
-    Directory* Directory::getParent() const { return this->parentDirectory; }
-
-
-
 }

@@ -11,7 +11,6 @@ namespace FileSystemKeskin
     {
         public:
             SoftLinkedFile();
-            SoftLinkedFile(string name, string path, string type, string linkedName);
 
             virtual void printToSystem() override;
             virtual void readFromSystem(int &line) override;
@@ -23,11 +22,10 @@ namespace FileSystemKeskin
             const string getLinkedPath() const;
 
             //Iterator Class
-            /*
             class iterator
             {
                 public:
-                    iterator(string* ptr) : current(ptr) {}
+                    iterator(vector<string>::iterator ptr) : current(ptr) {}
                     string& operator*() const { return *current; }
                     iterator& operator++() 
                     {
@@ -36,7 +34,7 @@ namespace FileSystemKeskin
                     }
                     iterator operator++(int)
                     {
-                        string* temp = current;
+                        vector<string>::iterator temp = current;
                         ++current;
                         return iterator(temp);
                     }
@@ -44,7 +42,7 @@ namespace FileSystemKeskin
                     bool operator!=(const iterator& oth) const { return current != oth.current; }
 
                 private:
-                    string* current;
+                    vector<string>::iterator current;
             };
             const iterator begin() const
             {
@@ -54,7 +52,7 @@ namespace FileSystemKeskin
             {
                 return iterator(linkedRegular->getData().end());
             }
-            */
+
         private:
             RegularFile *linkedRegular;
             string linkedFilePath;

@@ -19,7 +19,13 @@ namespace ShellKeskin
         this->rootDirectory->setName(".");
         this->currentDirectory = this->rootDirectory;
     }
-    Shell::~Shell() { /*Deleted all in directory_file.cpp*/ }
+    Shell::~Shell() 
+    { 
+        for(auto elm : this->files->getElements())
+            delete elm;
+        delete files;
+        delete rootDirectory;
+    }
     void Shell::startOS()
     {
         int lineCounter = 0;
@@ -98,7 +104,7 @@ namespace ShellKeskin
             }
             else
                 throw invalid_argument("error: file type unknown!");
-
+            
             lineCounter++;
             oldLineCounter++;
         }
@@ -107,6 +113,8 @@ namespace ShellKeskin
         this->addToFolders(); // Add special directories elements to them
         this->assignParents(); // Assign parents of directories
         this->checkInput(); // Get & check input
+
+
         
     }
 
@@ -130,7 +138,7 @@ namespace ShellKeskin
     }
     void Shell::lsRecursive(const Directory *current)
     {
-        cout << "./" << current->getName() << ":" << endl;
+        cout << "." << current->getPath() << ":" << endl;
         lsPrint(current);
         cout << endl;
         for(const auto elm : current->getElements())
@@ -293,6 +301,11 @@ namespace ShellKeskin
     /*----------------------------------------- (CP) -----------------------------------------*/
     void Shell::cp()
     {
+        for(auto elm : this->files->getElements())
+        {
+            if(inputs[2] == elm->getName())
+                throw invalid_argument("cp: file occurs on os!");
+        }
         if(inputs.size() == 1)
         {
             throw invalid_argument("cp: no file or directory name given!");
@@ -312,12 +325,16 @@ namespace ShellKeskin
                     if(elm->getName() == inputs[1] && elm->getPath() == absolutePath(elm,currentDirectory))
                     {
                         isDirectoryIn = true;
+
                         Directory* newDirectory = new Directory;
                         newDirectory->setName(this->inputs[2]);
                         newDirectory->setPath(absolutePath(newDirectory,currentDirectory));
                         newDirectory->setParent(currentDirectory);
+
                         newDirectory->printToSystem();
+
                         cp_directory(newDirectory,dynamic_cast<Directory*>(elm));
+
                         this->files->addElements(newDirectory);
                         currentDirectory->addElements(newDirectory);
                         return ;
@@ -333,25 +350,24 @@ namespace ShellKeskin
                     if(this->inputs[1] == elm->getName() && elm->getPath() == absolutePath(elm,this->currentDirectory))
                     {
                         OSKeskinFile = true;
+
                         RegularFile* copiedFile = new RegularFile;
                         copiedFile->setName(this->inputs[2]);
                         copiedFile->setPath(absolutePath(copiedFile,currentDirectory));
                         copiedFile->setData(dynamic_cast<RegularFile*>(elm)->getData());
-                        
+
                         if(this->fileSize + copiedFile->getSize() > 10*1024*1024)
-                            throw runtime_error("SIZE IS BIGGER THAN 10MB\n");
-                        else
-                            this->fileSize += copiedFile->getSize();
-                        
+                            throw runtime_error("size: size becomes bigger than 10mb!");
+                        this->fileSize += copiedFile->getSize();
                         copiedFile->printToSystem();
+
                         files->addElements(copiedFile);
                         currentDirectory->addElements(copiedFile);
-
                         return ;
                     }
                 }
             }
-                //If it is from Linux to OSKeskin
+            //If it is from Linux to OSKeskin
             bool flag = false;
             for(auto elm : this->files->getElements())
             {
@@ -363,13 +379,16 @@ namespace ShellKeskin
                         RegularFile *obj = new RegularFile;
                         obj = dynamic_cast<RegularFile*>(elm);
                         obj->fileToVector(this->inputs[1]);
-                        if(this->fileSize + obj->getSize() > 10*1024*1024)
-                            throw runtime_error("SIZE IS BIGGER THAN 10MB\n");
-                        else
-                            this->fileSize += obj->getSize();
-                        elm = obj;
 
+                        if(this->fileSize + obj->getSize() > 10*1024*1024)
+                            throw runtime_error("size: size becomes bigger than 10mb!");
+                        this->fileSize += obj->getSize();
+
+                        cout << obj->getSize() << " " << this->fileSize << endl; 
+
+                        elm = obj;
                         remove("OSKeskin.txt");
+
                         this->addToOS();
                         this->addToFiles(obj);
                         this->currentDirectory->addElements(obj);
@@ -383,10 +402,13 @@ namespace ShellKeskin
                 obj->setName(inputs[2]);
                 obj->setPath(absolutePath(obj,this->currentDirectory));
                 obj->fileToVector(this->inputs[1]);
+
                 if(this->fileSize + obj->getSize() > 10*1024*1024)
-                    throw runtime_error("SIZE IS BIGGER THAN 10MB\n");
-                else
-                    this->fileSize += obj->getSize();
+                    throw runtime_error("size: size becomes bigger than 10mb!");
+                this->fileSize += obj->getSize();
+
+                cout << obj->getSize() << " " << this->fileSize << endl; 
+
                 obj->printToSystem();
                 this->addToFiles(obj);
                 this->currentDirectory->addElements(obj);
@@ -410,9 +432,8 @@ namespace ShellKeskin
                 copyRegular->setData(dynamic_cast<RegularFile*>(elm)->getData());
                 
                 if(this->fileSize + copyRegular->getSize() > 10*1024*1024)
-                    throw runtime_error("SIZE IS BIGGER THAN 10MB\n");
-                else
-                    this->fileSize += copyRegular->getSize();
+                    throw runtime_error("size: size becomes bigger than 10mb!");
+                this->fileSize += copyRegular->getSize();
                 
                 newDirectory->addElements(copyRegular);
                 addToFiles(copyRegular);
@@ -426,9 +447,8 @@ namespace ShellKeskin
                 copyLinked->setPointer(dynamic_cast<SoftLinkedFile*>(elm)->getPointer());
                 
                 if(this->fileSize + copyLinked->getPointer()->getSize() > 10*1024*1024)
-                    throw runtime_error("SIZE IS BIGGER THAN 10MB\n");
-                else
-                    this->fileSize += copyLinked->getPointer()->getSize();
+                    throw runtime_error("size: size becomes bigger than 10mb!");
+                this->fileSize += copyLinked->getPointer()->getSize();
                 
                 newDirectory->addElements(copyLinked);
                 addToFiles(copyLinked);
@@ -443,11 +463,14 @@ namespace ShellKeskin
                 childDirectory->setName(elm->getName());
                 childDirectory->setPath(absolutePath(childDirectory,newDirectory));
                 childDirectory->setParent(newDirectory);
+                
+                addToFiles(childDirectory);
                 newDirectory->addElements(childDirectory);
                 childDirectory->printToSystem();
-                addToFiles(childDirectory);
+                
                 if(dynamic_cast<Directory*>(elm)->getElements().empty())
                     return;
+                
                 cp_directory(childDirectory,dynamic_cast<Directory*>(elm));
             }
         }
@@ -480,9 +503,8 @@ namespace ShellKeskin
                         obj->setPointer(dynamic_cast<RegularFile*>(elm));
                         
                         if(this->fileSize + obj->getPointer()->getSize() > 10*1024*1024)
-                            throw runtime_error("SIZE IS BIGGER THAN 10MB\n");
-                        else
-                            this->fileSize += obj->getPointer()->getSize();
+                            throw runtime_error("size: size becomes bigger than 10mb!");
+                        this->fileSize += obj->getPointer()->getSize();
                         
                         obj->printToSystem();
                         this->addToFiles(obj);
@@ -652,7 +674,7 @@ namespace ShellKeskin
         else
             return current->getPath() + "/" + obj->getName();
     }
-    //Roota burada da ekleyebilirsin
+    
     void Shell::addToFolders()
     {
         for(auto directory : this->files->getElements())
@@ -731,7 +753,9 @@ namespace ShellKeskin
                 this->transformInput(input);
 
                 if(this->inputs[0] == "quit")
-                    return ;
+                {
+                    return;
+                }
                 else if(this->inputs[0] == "ls")
                     this->ls();
                 else if(this->inputs[0] == "mkdir")

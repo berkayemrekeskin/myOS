@@ -4,39 +4,29 @@ using namespace std;
 /*------------------------------------ REGULAR FILE CLASS IMPLEMENTATION ------------------------------------*/
 namespace FileSystemKeskin
 {
-    RegularFile::RegularFile() : File("ft_regular"), size(0) {/*Default is enough*/}
-    RegularFile::RegularFile(string name, string path, string type) : File(name,path,type), size(0) { this->printToSystem(); }
+    RegularFile::RegularFile() : File("ft_regular"), size(0) {}
     
     size_t RegularFile::getSize() const {return size;}
     vector<string> RegularFile::getData() const { return this->data; }
     void RegularFile::setData(const vector<string> &newData) 
     { 
         this->data = newData; 
+        this->size = 0;
         for(auto elm : this->data)
             this->size += sizeof(elm);
-            
     }
 
     void RegularFile::printToSystem() {
         
         File::printToSystem();
 
-        this->size = 0;
-        
         ofstream os("OSKeskin.txt", std::ios::app);
         if(!os.is_open())
         {
             throw invalid_argument("error: os cannot open!");
         }
-        if(!data.empty())
-        {
-            for(auto line : data)
-            {
-                size += sizeof(line);
-            }
-        }
         os << size << endl;
-        
+
         if(!data.empty())
         {
             for(auto line : data)
@@ -121,6 +111,14 @@ namespace FileSystemKeskin
             data.push_back(line);
         }
         OSFile.close();
+        
+        if(!data.empty())
+        {
+            for(auto line : data)
+            {
+                size += sizeof(line);
+            }
+        }
     }
 }
     

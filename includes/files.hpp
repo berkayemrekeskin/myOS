@@ -15,9 +15,9 @@ namespace FileSystemKeskin
     {
         public: 
 
+            File();
             File(string _type);
-            File(string name, string path, string type);
-            virtual ~File() = 0;    
+            virtual ~File();    
 
             virtual void printToSystem(); //Saving to the OS
             virtual void readFromSystem(int &line) = 0; //Reading from the OS

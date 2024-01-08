@@ -10,10 +10,6 @@ namespace FileSystemKeskin
     {
         public:
             Directory();
-            Directory(string name, string path, string type);
-            Directory(const Directory &oth);
-            Directory & operator=(const Directory &oth);
-            virtual ~Directory();
             
             virtual void printToSystem() override;
             virtual void readFromSystem(int &line) override;
@@ -25,12 +21,11 @@ namespace FileSystemKeskin
             void setParent(Directory* parent);
             Directory* getParent() const;
 
-            //Iterator Class
             class iterator
             {
                 public:
-                    iterator(File* ptr) : current(ptr) {}
-                    File& operator*() const { return *current; }
+                    iterator(vector<File*>::iterator ptr) : current(ptr) {}
+                    File*& operator*() const { return *current; }
                     iterator& operator++() 
                     {
                         ++current;
@@ -38,7 +33,7 @@ namespace FileSystemKeskin
                     }
                     iterator operator++(int)
                     {
-                        File* temp = current;
+                        vector<File*>::iterator temp = current;
                         ++current;
                         return iterator(temp);
                     }
@@ -46,17 +41,17 @@ namespace FileSystemKeskin
                     bool operator!=(const iterator& oth) const { return current != oth.current; }
 
                 private:
-                    File* current;
+                    vector<File*>::iterator current;
             };
-            const iterator begin() const
+            iterator begin() const
             {
-                return iterator(elements[0]);
+                return iterator(this->getElements().begin());
             }
-            const iterator end() const
+            iterator end() const
             {
-                return iterator(elements[elements.size()]);
+                return iterator(this->getElements().end());
             }
-
+            
         private:
             Directory * parentDirectory;
             vector<File *> elements;

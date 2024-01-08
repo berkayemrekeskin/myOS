@@ -4,22 +4,10 @@ using namespace std;
 /*------------------------------------ FILE CLASS IMPLEMENTATION ------------------------------------*/
 namespace FileSystemKeskin
 {
-    
+    File::File() {}
     File::File(string _type) : type(_type)
     { 
         time_t currentTime = std::time(nullptr);
-        struct tm *timeinfo = std::localtime(&currentTime);
-        //auto currentTimePoint = std::chrono::system_clock::now();
-        //std::time_t currentTime = std::chrono::system_clock::to_time_t(currentTimePoint);
-        time = std::ctime(&currentTime);
-        time.erase(time.length()-1);
-    }
-    File::File(string n, string p, string t) : name(n), path(p), type(t) 
-    {
-        time_t currentTime = std::time(nullptr);
-        struct tm *timeinfo = std::localtime(&currentTime);
-        //auto currentTimePoint = std::chrono::system_clock::now();
-        //std::time_t currentTime = std::chrono::system_clock::to_time_t(currentTimePoint);
         time = std::ctime(&currentTime);
         time.erase(time.length()-1);
     }
