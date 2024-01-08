@@ -11,16 +11,20 @@ namespace FileSystemKeskin
         public:
             Directory();
             
-            virtual void printToSystem() override;
-            virtual void readFromSystem(int &line) override;
-            virtual void showContents() const override;
+            virtual void printToSystem() override; // Overrides the virtual function
+            virtual void readFromSystem(int &line) override; // Overrides the virtual function
+            virtual void showContents() const override; // Overrides the virtual function
 
-            void addElements(File *elm);
-            vector<File *> getElements() const;
+            void addElements(File *elm); // Adding elements to the vector<File*>elements
+            void removeFile(File *file);
+
+            // Setters & getters
             void setElements(const vector<File*> &other);
             void setParent(Directory* parent);
             Directory* getParent() const;
-
+            vector<File *> getElements() const;
+            
+            // Iterator class
             class iterator
             {
                 public:
@@ -53,9 +57,8 @@ namespace FileSystemKeskin
             }
             
         private:
-            Directory * parentDirectory;
+            Directory * parentDirectory; // This holds the parent of the directory, helps to 'cd' command and others
             vector<File *> elements;
-
     };
 }
     

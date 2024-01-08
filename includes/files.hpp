@@ -9,6 +9,14 @@
 #include <ctime>
 using namespace std;
 
+/*  
+    NOTE FOR MY IMPLEMENTATION:
+        - In the pdf file, it says that some functions should be pure virtual and
+        overridden in the other classes. I done that but my functions names are not 
+        same with the commands. For example, my showContents function handles the 
+        'cat' command but i named them in my Shell class.
+*/
+
 namespace FileSystemKeskin
 {
     class File
@@ -19,11 +27,12 @@ namespace FileSystemKeskin
             File(string _type);
             virtual ~File();    
 
-            virtual void printToSystem(); //Saving to the OS
-            virtual void readFromSystem(int &line) = 0; //Reading from the OS
-            virtual void showContents() const = 0; //Pure virtual 'cat' function helper
-            void splitLine(const string &input, vector<string> &vect);
+            virtual void printToSystem(); // Printing to the OSKeskin.txt file
+            virtual void readFromSystem(int &line) = 0; // Reading from the OSKeskin.txt file
+            virtual void showContents() const = 0; // Pure virtual 'cat' function.
+            void splitLine(const string &input, vector<string> &vect); // Helper for reading & getting inputs
 
+            // Getters & setters
             const string getName() const;
             const string getPath() const;
             const string getType() const;
@@ -40,7 +49,7 @@ namespace FileSystemKeskin
             string time;
     };
 
-
+    // Templated searching function for elements.
     template<typename T> 
     bool isIn(const T& element, const vector<T> vect)
     {

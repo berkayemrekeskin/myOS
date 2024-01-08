@@ -9,9 +9,12 @@ using namespace FileSystemKeskin;
 
 namespace ShellKeskin
 {
-    Shell::Shell() 
+    const size_t Shell::MAX_SIZE = 10*1024*1024;    // Setting the size of the OSKeskin, which is 10MB
+
+    Shell::Shell() // Constructor
     {
-        this->fileSize = 0;
+        // Initializing the variables
+        this->fileSize = 0; // Setting the size of the OSKeskin to 0
         this->files = new Directory;
         this->rootDirectory = new Directory;
         this->rootDirectory->setParent(nullptr);
@@ -26,11 +29,13 @@ namespace ShellKeskin
         delete files;
         delete rootDirectory;
     }
-    void Shell::startOS()
+    // Start the OS
+    void Shell::startOS() 
     {
         int lineCounter = 0;
         int oldLineCounter = 0;
         int totalLine = 0;
+
         string line;
         vector<string> fileInfo;
 
@@ -66,6 +71,7 @@ namespace ShellKeskin
             fileInfo.clear();
             this->splitLine(line,fileInfo);
             
+            // Check the file type and add to files
             if(fileInfo[0] == "ft_regular")
             {
                 RegularFile * obj = new RegularFile;
@@ -74,7 +80,6 @@ namespace ShellKeskin
                 this->addToFiles(obj);
                 if(obj->getPath() == absolutePath(obj,rootDirectory))
                     rootDirectory->addElements(obj);
-                
             }
             else if(fileInfo[0] == "ft_linked")
             {
@@ -92,7 +97,6 @@ namespace ShellKeskin
                 this->addToFiles(obj);
                 if(obj->getPath() == absolutePath(obj,rootDirectory))
                     rootDirectory->addElements(obj);
-                
             }
             else if(fileInfo[0] == "ft_directory")
             {
@@ -110,12 +114,9 @@ namespace ShellKeskin
         }
         os.close();
 
-        this->addToFolders(); // Add special directories elements to them
+        this->addToFolders(); // Add special directories elements to themselves
         this->assignParents(); // Assign parents of directories
         this->checkInput(); // Get & check input
-
-
-        
     }
 
     /*----------------------------------------- (LS) -----------------------------------------*/
@@ -123,25 +124,25 @@ namespace ShellKeskin
     {
         if(this->inputs.size() > 2)
         {
-            throw invalid_argument("ls: too much inputs!");
+            throw invalid_argument("ls: too much inputs!"); 
         }
         else if(this->inputs.size() == 2 && this->inputs[1] == "-R")
         {
-            this->lsRecursive(currentDirectory);
+            this->lsRecursive(currentDirectory); // Recursive ls
         }
         else if(this->inputs.size() == 1)
         {
-            lsPrint(this->currentDirectory);
+            lsPrint(this->currentDirectory); // Print current directory
         }
         else
             throw invalid_argument("ls: wrong inputs!");
     }
-    void Shell::lsRecursive(const Directory *current)
+    void Shell::lsRecursive(const Directory *current) // Recursive ls
     {
-        cout << "." << current->getPath() << ":" << endl;
+        cout << "." << current->getPath() << ":" << endl; 
         lsPrint(current);
         cout << endl;
-        for(const auto elm : current->getElements())
+        for(auto elm : current->getElements()) // Recursive call
         {
             if(dynamic_cast<Directory *>(elm))
             {
@@ -149,10 +150,8 @@ namespace ShellKeskin
             }
         }
     }
-    void Shell::lsPrint(const Directory* current)
+    void Shell::lsPrint(const Directory* current) // Print current directory
     {
-        //#bunları daha detaylı yapabilirsin ama çalışıyolar
-        cout << this->fileSize << endl;
         if(current == rootDirectory)
         {
             cout << "D " << "." << "        " << files->getTime() << endl;
@@ -162,28 +161,30 @@ namespace ShellKeskin
             cout << "D " << "." << "        " << files->getTime() << endl;
             cout << "D " << ".." << "        " << files->getTime() << endl;
         }
-        for(auto elm : current->getElements())
+        for(auto elm : current->getElements())  // Print elements of current directory
         {
             if(absolutePath(elm,current) == elm->getPath())
             {
                 if(elm->getType() == "ft_directory")
-                    {
-                        cout << "D " << elm->getName() << "        " << elm->getTime() << endl;
-                    }
-                    else if(elm->getType() == "ft_regular")
-                    {
-                        RegularFile * obj = dynamic_cast<RegularFile *>(elm);
-                        cout << "F " << obj->getName() << "        " << obj->getTime() << "        " << obj->getSize() << endl;
-                    }
-                    else if(elm->getType() == "ft_linked")
-                    {
-                        SoftLinkedFile * obj = dynamic_cast<SoftLinkedFile *>(elm);
-                        cout << "L " << obj->getName() << "        " << obj->getTime() << "        " << obj->getPointer()->getSize() << endl;
-                    }
+                {
+                    cout << "D " << elm->getName() << "        " << elm->getTime() << endl;
+                }
+                else if(elm->getType() == "ft_regular")
+                {
+                    RegularFile * obj = dynamic_cast<RegularFile *>(elm);
+                    cout << "F " << obj->getName() << "        " << obj->getTime() << "        " << obj->getSize() << endl;
+                }
+                else if(elm->getType() == "ft_linked")
+                {
+                    SoftLinkedFile * obj = dynamic_cast<SoftLinkedFile *>(elm);
+                    cout << "L " << obj->getName() << "        " << obj->getTime() << "        " << obj->getPointer()->getSize() << endl;
+                }
             }
         }
     }
+
     /*----------------------------------------- (MKDIR) -----------------------------------------*/
+    // Create directories
     void Shell::mkdir()
     {
         if(this->inputs.size() == 1)
@@ -196,13 +197,18 @@ namespace ShellKeskin
         }
         else
         {
+            //Check if directory is already in OSKeskin
             for(auto elm : files->getElements())
             {
+                //If it is in OSKeskin
                 if(elm->getName() == inputs[1] && elm->getPath() == absolutePath(elm,this->currentDirectory))
                 {
                     if(dynamic_cast<Directory*>(elm))
                     {
-                        rmdir(dynamic_cast<Directory*>(elm));
+                        //Remove directory from OSKeskin
+                        rmdir(elm,currentDirectory);
+                        remove("OSKeskin.txt");
+                        this->addToOS();
                         return;
                     }
                 }
@@ -217,48 +223,36 @@ namespace ShellKeskin
             currentDirectory->addElements(obj);
         }
     }
-    void Shell::rmdir(Directory* removed)
+    void Shell::removeFromFiles(File* file, Directory* current) // Remove from files
     {
-        int len_of_path = absolutePath(removed,currentDirectory).length();
-        vector<File*> files_others;
-        vector<File*> current_others;
-        
-        for(auto elm : this->files->getElements())
-        {
-            cout << "f: "<<elm->getPath().substr(0,len_of_path) << " " << elm->getPath() << endl;
-            if(elm->getPath().substr(0,len_of_path) != absolutePath(removed,currentDirectory))
-            {
-                cout << "FILES: "<< elm->getName() << endl;
-                files_others.push_back(elm);
-            }
-        }
-        for(auto elm : this->currentDirectory->getElements())
-        {
-            cout << "c: "<<  elm->getPath().substr(0,len_of_path) << " " << elm->getPath() << endl;
-            if(elm->getPath().substr(0,len_of_path) != absolutePath(removed,currentDirectory))
-            {
-                cout << "CURRENT: "<< elm->getName() << endl;
-                current_others.push_back(elm);
-            }
-            else
-            {
-                delete elm;
-            }
-        }
-        for(auto elm : files_others)
-            cout << "FF: " <<elm->getName() << " ";
-        for(auto elm : current_others)
-            cout << "CC: " <<elm->getName() << " ";
-        cout << endl;
-
-        this->files->setElements(files_others);
-        this->currentDirectory->setElements(current_others);
-
-        remove("OSKeskin.txt");
-        addToOS();
+        this->files->removeFile(file);
+            if(file != nullptr)
+                current->removeFile(file);
     }
-
+    void Shell::rmdir(File *file, Directory* current) // Remove directories
+    {
+        if (file->getName() == "/")
+        {
+            throw std::runtime_error("rmdir: root cannot be removed!");
+        }
+        else if (file->getType() == "ft_directory")
+        {
+            Directory *childDirectory = dynamic_cast<Directory *>(file);
+            vector<File *> files = childDirectory->getElements();
+            for (const auto& file : files)
+            {
+                if (file->getType() == "ft_regular" || file->getType() == "ft_linked")
+                    removeFromFiles(file, childDirectory);
+                else if (file->getType() == "ft_directory")
+                    rmdir(file, childDirectory);
+            }
+            this->files->removeFile(file);
+            if(file != nullptr)
+                current->removeFile(file);
+        }
+    }
     /*----------------------------------------- (RM) -----------------------------------------*/
+    // Remove files
     void Shell::rm()
     {
         if(this->inputs.size() == 1)
@@ -274,7 +268,6 @@ namespace ShellKeskin
             bool isFound = false;
             for(auto removed : this->files->getElements())
             {
-                // Remove files
                 if(dynamic_cast<RegularFile*>(removed) || dynamic_cast<SoftLinkedFile*>(removed))
                 {
                     if(removed->getName() == inputs[1] && removed->getPath() == absolutePath(removed,this->currentDirectory))
@@ -282,24 +275,23 @@ namespace ShellKeskin
                         isFound = true;
                         vector<File*> temp_files;
                         vector<File*> temp_parent;
-                        //remove from files
+                        //Remove from OSKeskin
                         for(auto elm : this->files->getElements())
                         {
                             if(elm != removed)
                             {
-                                cout << elm->getName() << endl;
                                 temp_files.push_back(elm);
                             }
                         }
-                        //remove from directory
+                        //Remove from directory
                         for(auto elm : this->currentDirectory->getElements())
                         {
                             if(elm != removed)
                             {
-                                cout << elm->getName() << endl;
                                 temp_parent.push_back(elm);
                             }
                         }
+                        //Delete the file
                         this->files->setElements(temp_files);
                         this->currentDirectory->setElements(temp_parent);
                         delete removed;
@@ -317,8 +309,10 @@ namespace ShellKeskin
         }
     }
     /*----------------------------------------- (CP) -----------------------------------------*/
+    // Copy files & directories
     void Shell::cp()
     {
+        //Check if file is already in OSKeskin
         for(auto elm : this->files->getElements())
         {
             if(inputs[2] == elm->getName())
@@ -343,18 +337,15 @@ namespace ShellKeskin
                     if(elm->getName() == inputs[1] && elm->getPath() == absolutePath(elm,currentDirectory))
                     {
                         isDirectoryIn = true;
-
                         Directory* newDirectory = new Directory;
                         newDirectory->setName(this->inputs[2]);
                         newDirectory->setPath(absolutePath(newDirectory,currentDirectory));
                         newDirectory->setParent(currentDirectory);
-
                         newDirectory->printToSystem();
 
                         cp_directory(newDirectory,dynamic_cast<Directory*>(elm));
-
                         this->files->addElements(newDirectory);
-                        currentDirectory->addElements(newDirectory);
+                        this->currentDirectory->addElements(newDirectory);
                         return ;
                     }
                 }
@@ -374,13 +365,13 @@ namespace ShellKeskin
                         copiedFile->setPath(absolutePath(copiedFile,currentDirectory));
                         copiedFile->setData(dynamic_cast<RegularFile*>(elm)->getData());
 
-                        if(this->fileSize + copiedFile->getSize() > 10*1024*1024)
+                        if(this->fileSize + copiedFile->getSize() > MAX_SIZE)
                             throw runtime_error("size: size becomes bigger than 10mb!");
                         this->fileSize += copiedFile->getSize();
                         copiedFile->printToSystem();
 
-                        files->addElements(copiedFile);
-                        currentDirectory->addElements(copiedFile);
+                        this->files->addElements(copiedFile);
+                        this->currentDirectory->addElements(copiedFile);
                         return ;
                     }
                 }
@@ -398,11 +389,10 @@ namespace ShellKeskin
                         obj = dynamic_cast<RegularFile*>(elm);
                         obj->fileToVector(this->inputs[1]);
 
-                        if(this->fileSize + obj->getSize() > 10*1024*1024)
+                        //Check if size is bigger than 10MB
+                        if(this->fileSize + obj->getSize() > MAX_SIZE)
                             throw runtime_error("size: size becomes bigger than 10mb!");
                         this->fileSize += obj->getSize();
-
-                        cout << obj->getSize() << " " << this->fileSize << endl; 
 
                         elm = obj;
                         remove("OSKeskin.txt");
@@ -421,11 +411,11 @@ namespace ShellKeskin
                 obj->setPath(absolutePath(obj,this->currentDirectory));
                 obj->fileToVector(this->inputs[1]);
 
-                if(this->fileSize + obj->getSize() > 10*1024*1024)
+                //Check if size is bigger than 10MB
+                if(this->fileSize + obj->getSize() > MAX_SIZE)
                     throw runtime_error("size: size becomes bigger than 10mb!");
                 this->fileSize += obj->getSize();
 
-                cout << obj->getSize() << " " << this->fileSize << endl; 
 
                 obj->printToSystem();
                 this->addToFiles(obj);
@@ -438,10 +428,12 @@ namespace ShellKeskin
             }
         }
     }
+    // Copy directories recursively
     void Shell::cp_directory(Directory* newDirectory, Directory* current)
     {
         for(auto elm : current->getElements())
         {
+            //If it is a file
             if(elm->getType() == "ft_regular")
             {
                 RegularFile* copyRegular = new RegularFile;
@@ -449,7 +441,8 @@ namespace ShellKeskin
                 copyRegular->setPath(absolutePath(copyRegular,newDirectory));
                 copyRegular->setData(dynamic_cast<RegularFile*>(elm)->getData());
                 
-                if(this->fileSize + copyRegular->getSize() > 10*1024*1024)
+                //Check if size is bigger than 10MB
+                if(this->fileSize + copyRegular->getSize() > MAX_SIZE)
                     throw runtime_error("size: size becomes bigger than 10mb!");
                 this->fileSize += copyRegular->getSize();
                 
@@ -457,14 +450,16 @@ namespace ShellKeskin
                 addToFiles(copyRegular);
                 copyRegular->printToSystem();
             }
+            //If it is a linked file
             else if(elm->getType() == "ft_linked")
             {
                 SoftLinkedFile* copyLinked = new SoftLinkedFile;
                 copyLinked->setName(elm->getName());
                 copyLinked->setPath(absolutePath(copyLinked,newDirectory));
                 copyLinked->setPointer(dynamic_cast<SoftLinkedFile*>(elm)->getPointer());
-                
-                if(this->fileSize + copyLinked->getPointer()->getSize() > 10*1024*1024)
+
+                //Check if size is bigger than 10MB
+                if(this->fileSize + copyLinked->getPointer()->getSize() > MAX_SIZE)
                     throw runtime_error("size: size becomes bigger than 10mb!");
                 this->fileSize += copyLinked->getPointer()->getSize();
                 
@@ -473,6 +468,7 @@ namespace ShellKeskin
                 copyLinked->printToSystem();
             }
         }
+        //If there is a directory
         for(auto elm : current->getElements())
         {
             if(dynamic_cast<Directory*>(elm))
@@ -488,12 +484,13 @@ namespace ShellKeskin
                 
                 if(dynamic_cast<Directory*>(elm)->getElements().empty())
                     return;
-                
+                //Recursive call
                 cp_directory(childDirectory,dynamic_cast<Directory*>(elm));
             }
         }
     }
     /*----------------------------------------- (LINK) -----------------------------------------*/
+    // Link files
     void Shell::link()
     {
         if(inputs.size() == 1)
@@ -506,6 +503,7 @@ namespace ShellKeskin
         }
         else
         {
+            //Check if file is in OSKeskin
             bool isRegularFound = false;
             for(auto elm : this->files->getElements())
             {
@@ -519,8 +517,9 @@ namespace ShellKeskin
                         obj->setPath(absolutePath(obj,currentDirectory));
                         obj->setLinkedPath(elm->getPath());
                         obj->setPointer(dynamic_cast<RegularFile*>(elm));
-                        
-                        if(this->fileSize + obj->getPointer()->getSize() > 10*1024*1024)
+
+                        //Check if size is bigger than 10MB
+                        if(this->fileSize + obj->getPointer()->getSize() > MAX_SIZE)
                             throw runtime_error("size: size becomes bigger than 10mb!");
                         this->fileSize += obj->getPointer()->getSize();
                         
@@ -538,6 +537,7 @@ namespace ShellKeskin
         }
     }
     /*----------------------------------------- (CD) -----------------------------------------*/
+    // Change directories 
     void Shell::cd()
     {
         Directory* temp_parent = currentDirectory;
@@ -545,16 +545,16 @@ namespace ShellKeskin
         {
             throw invalid_argument("cd: too much inputs!");
         }
-        else if(this->inputs.size() == 1)
+        else if(this->inputs.size() == 1) // If there is no input
         {
             this->currentDirectory = this->rootDirectory;
             return ;
         }
-        else if(this->inputs[1] == "." || this->inputs[1] == ".." || this->inputs[1] == "/")
+        else if(this->inputs[1] == "." || this->inputs[1] == ".." || this->inputs[1] == "/") // If it is a special input
         {
             this->cd_checkInputs(temp_parent);
         }
-        else
+        else // If it is a path
         {
             temp_parent = currentDirectory;
             this->cd_checkPaths();
@@ -562,31 +562,30 @@ namespace ShellKeskin
     }
     void Shell::cd_checkInputs(const Directory* temp_parent)
     {
-        
-        if(this->inputs[1] == ".")
+        if(this->inputs[1] == ".")  // If it is a current directory
             return ;
-        if(this->inputs[1] == "/")
+        if(this->inputs[1] == "/") // If it is a root directory
         {
             this->currentDirectory = this->rootDirectory;
             return ;
         }
-        if(this->inputs[1] == "..")
+        if(this->inputs[1] == "..") // If it is a parent directory
         {
-            if(currentDirectory == rootDirectory)
+            if(currentDirectory == rootDirectory) // If it is a root directory
             {
                 throw invalid_argument("cd: you are in the root!");
                 return;
             }
-            if(currentDirectory->getParent() == rootDirectory)
+            if(currentDirectory->getParent() == rootDirectory) // If it is a parent of root directory
             {
                 this->currentDirectory = this->rootDirectory;
                 return;
             }
-            for(auto elm : this->files->getElements())
+            for(auto elm : this->files->getElements()) 
             {
                 if(dynamic_cast<Directory*>(elm))
                 {
-                    if(dynamic_cast<Directory*>(elm) == temp_parent)
+                    if(dynamic_cast<Directory*>(elm) == temp_parent) // If it is a parent directory
                     {
                         this->currentDirectory = dynamic_cast<Directory*>(elm)->getParent();
                         return ;
@@ -598,14 +597,14 @@ namespace ShellKeskin
     }
     void Shell::cd_checkPaths()
     {
-        if(this->inputs[1][0] == '/')
+        if(this->inputs[1][0] == '/') // If it is a path
         {
             bool isIn = false;
             for(const auto &elm : this->files->getElements())
             {
                 if(dynamic_cast<Directory*>(elm))
                 {
-                    if(elm->getPath() == inputs[1])
+                    if(elm->getPath() == inputs[1]) // If path is found
                     {
                         isIn = true;
                         this->currentDirectory = dynamic_cast<Directory*>(elm);
@@ -627,7 +626,7 @@ namespace ShellKeskin
                 {
                     if(dynamic_cast<Directory*>(elm))
                     {
-                        if(elm->getPath() == absolutePath(elm,this->currentDirectory))
+                        if(elm->getPath() == absolutePath(elm,this->currentDirectory)) // If path is found
                         {
                             isIn = true;
                             this->currentDirectory = dynamic_cast<Directory*>(elm);
@@ -644,6 +643,7 @@ namespace ShellKeskin
         
     }
     /*----------------------------------------- (CAT) -----------------------------------------*/
+    // Show contents of files
     void Shell::cat()
     {
         if(this->inputs.size() == 1)
@@ -659,21 +659,21 @@ namespace ShellKeskin
             bool isFound = false;
             for(auto elm : this->currentDirectory->getElements())
             {
-                if(this->inputs[1][0] != '/')
+                if(this->inputs[1][0] != '/')   
                 {
-                    if(this->inputs[1] == elm->getName() && elm->getPath() == absolutePath(elm,currentDirectory))
+                    if(this->inputs[1] == elm->getName() && elm->getPath() == absolutePath(elm,currentDirectory)) // If file is found
                     {
-                        isFound = true;
-                        elm->showContents();
+                        isFound = true; 
+                        elm->showContents(); // Show contents of file
                         return ;
                     }
                 }
                 else
                 {
-                    if(this->inputs[1] == elm->getPath())
+                    if(this->inputs[1] == elm->getPath()) // If path is found
                     {
                         isFound = true;
-                        elm->showContents();
+                        elm->showContents(); // Show contents of file
                         return ;
                     }
                 }
@@ -685,7 +685,8 @@ namespace ShellKeskin
         }
     }
     /*----------------------------------------- (HELPERS) -----------------------------------------*/
-    const string Shell::absolutePath(const File* obj, const Directory* current) const
+    
+    const string Shell::absolutePath(const File* obj, const Directory* current) const // Get absolute path
     {
         if(current == rootDirectory)
             return rootDirectory->getPath() + obj->getName();
@@ -693,7 +694,7 @@ namespace ShellKeskin
             return current->getPath() + "/" + obj->getName();
     }
     
-    void Shell::addToFolders()
+    void Shell::addToFolders() // Add special directories elements to themselves
     {
         for(auto directory : this->files->getElements())
         {
@@ -709,7 +710,7 @@ namespace ShellKeskin
             }
         }
     }
-    void Shell::assignParents()
+    void Shell::assignParents() // Assign parents of directories
     {
         for(auto folder : this->files->getElements())
         {
@@ -729,72 +730,73 @@ namespace ShellKeskin
             }
         }
     }
-    void Shell::addToFiles(File *obj)
+    void Shell::addToFiles(File *obj) // Add to files
     {
         this->files->addElements(obj); 
     }
 
-    void Shell::addToOS()
+    void Shell::addToOS() // Add to OSKeskin
     {
         for(auto elm : this->files->getElements())
         {
             elm->printToSystem();
         }
     }
-    void Shell::getInput(string &input)
+    void Shell::getInput(string &input) // Get input
     {
         cout << "> ";
         getline(cin,input);
     }
-    void Shell::transformInput(string &input) 
+    void Shell::transformInput(string &input) // Transform input
     {
         this->getInput(input);
         this->splitLine(input,this->inputs);
     }
-    void Shell::splitLine(const string &input, vector<string> &vect)
+    void Shell::splitLine(const string &input, vector<string> &vect) // Split input
     {
         stringstream ss(input);
         string word;
         while(ss >> word)
             vect.push_back(word);
     }
-    void Shell::checkInput()
+    void Shell::checkInput() // Check input
     {
             string input;
             vector<string> empty;
             bool isDone = false;
-            while(!isDone)
+            while(!isDone)  // Check input until quit
             {
-                try
+                try // Check if there is an error
                 {   
-                inputs = empty;
-                this->transformInput(input);
+                    inputs = empty; // Clear the inputs
+                    this->transformInput(input); // Transform input
 
-                if(this->inputs[0] == "quit")
-                {
-                    return;
+                    // Check the command
+                    if(this->inputs[0] == "quit")
+                    {
+                        return;
+                    }
+                    else if(this->inputs[0] == "ls")
+                        this->ls();
+                    else if(this->inputs[0] == "mkdir")
+                        this->mkdir();
+                    else if(this->inputs[0] == "rm")
+                        this->rm();
+                    else if(this->inputs[0] == "cp")
+                        this->cp();
+                    else if(this->inputs[0] == "link")
+                        this->link();
+                    else if(this->inputs[0] == "cd")
+                        this->cd();
+                    else if(this->inputs[0] == "cat")
+                        this->cat();
+                    else
+                        throw invalid_argument("error: wrong command, command not found!");
+                    input.clear();
                 }
-                else if(this->inputs[0] == "ls")
-                    this->ls();
-                else if(this->inputs[0] == "mkdir")
-                    this->mkdir();
-                else if(this->inputs[0] == "rm")
-                    this->rm();
-                else if(this->inputs[0] == "cp")
-                    this->cp();
-                else if(this->inputs[0] == "link")
-                    this->link();
-                else if(this->inputs[0] == "cd")
-                    this->cd();
-                else if(this->inputs[0] == "cat")
-                    this->cat();
-                else
-                    throw invalid_argument("error: wrong command, command not found!");
-                input.clear();
-                }
-                catch(const std::exception& e)
+                catch(const std::exception& e) // Catch the error
                 {
-                    cout << e.what() << endl;
+                    cout << e.what() << endl; // Print the error
                 }
             }
             return ;

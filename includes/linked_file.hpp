@@ -12,10 +12,11 @@ namespace FileSystemKeskin
         public:
             SoftLinkedFile();
 
-            virtual void printToSystem() override;
-            virtual void readFromSystem(int &line) override;
-            virtual void showContents() const override;
+            virtual void printToSystem() override; // Overrides the virtual function
+            virtual void readFromSystem(int &line) override; // Overrides the virtual function
+            virtual void showContents() const override; // Overrides the virtual function
 
+            //Setters & getters
             void setPointer(RegularFile *obj);
             void setLinkedPath(const string &path);
             RegularFile * getPointer() const;
@@ -54,8 +55,8 @@ namespace FileSystemKeskin
             }
 
         private:
-            RegularFile *linkedRegular;
-            string linkedFilePath;
+            RegularFile *linkedRegular; // I hold a RegularFile pointer to point the file has been linked.
+            string linkedFilePath;  // Holding the path of the linked file makes the link unique
     };
 }
 

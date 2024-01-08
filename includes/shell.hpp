@@ -13,54 +13,53 @@ namespace ShellKeskin
     class Shell
     {
         public:
+
             Shell();
             ~Shell();
+
             void startOS();
 
-            //Input functions
+            // Input functions
             void getInput(string &input);
             void transformInput(string &input);
             void splitLine(const string &input, vector<string> &vect);
             void checkInput();
-
-            //Element add & delete
+            // Element add & delete
             void addToOS();
             void addToFiles(File* obj);
             void addToFolders();
             void assignParents();
-
-            //Helpers
+            // Helpers
             const string absolutePath(const File *obj, const Directory* current) const;
-
-            //Commands & command helpers
-            void ls(); // #pathleri kontrol et, cur.path ile aynıysa isimleri printle
-            void lsRecursive(const Directory *current); // #currentpathden pathVectorün son elemanına kadar(en uzunu) her pathe gelince elemanlarını printle (path ismiyle birlikte)
-            void lsPrint(const Directory *current);            
-            
-            void mkdir();   // #yeni bir directory obj oluştur, filesysteme pushla, myOS yazdır
-            void rmdir(Directory* removed); // if mkdir gets input that os has, then delete that folder with its elements recurively
-            void rmdirRecursive(Directory* current);
-
-            void rm(); // #adı girilen fileı filesystemde bul, filesystemden sil, filesystemi en baştan myOS yazdır silinmiş haliyle yazılsın
-            
-            void cp(); // #file adını al, regularFile obj oluştur, fileTOVector kullan, filesysteme pushla, myOS yazdır
-            void cp_directory(Directory* newDirectory,Directory* current);
-            
-            void link(); // #file adını al, filesystemde regFileı bul, linkedFile obj oluştur, linkedFile obj pointerıyla regFile pointle, filesysteme pushla, myOS yazdır 
-            
-            void cd(); //directory name al, pathVectorde varsa ve doğru komut girdiyse (.. etc) current pathi değiştir
-            void cd_checkInputs(const Directory *temp_parent);
-            void cd_checkPaths();
-            
-            void cat();
-
-
+            // Commands & command helpers
+                // LS & LS -R 
+                void ls();
+                void lsRecursive(const Directory *current);
+                void lsPrint(const Directory *current);            
+                // MKDIR & RMDIR
+                void mkdir();
+                void removeFromFiles(File* file, Directory* parentDir);
+                void rmdir(File *file, Directory* parentDir);
+                // RM FILES
+                void rm();
+                // CP FILES & DIRECTORIES
+                void cp();
+                void cp_directory(Directory* newDirectory,Directory* current);
+                // LINK FILES
+                void link();
+                // CD DIRECTORIES
+                void cd();
+                void cd_checkInputs(const Directory *temp_parent);
+                void cd_checkPaths();
+                // CAT FILES & DIRECTORIES
+                void cat();
         private:
-            Directory* files;
-            Directory* currentDirectory; // #Anlık pathi tutar
-            Directory* rootDirectory;
-            size_t fileSize;
-            vector<string> inputs;
+            Directory* files; // Holds all the files in the OSKeskin.txt
+            Directory* currentDirectory; // Holds the current directory
+            Directory* rootDirectory; // Holds the root directory
+            size_t fileSize; // Size of the OSKeskin
+            vector<string> inputs; // Holds the inputs of commands
+            const static size_t MAX_SIZE; // Maximum size which is 10MB
     };
 
 }

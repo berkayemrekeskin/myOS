@@ -10,18 +10,18 @@ namespace FileSystemKeskin
     {
         public:
             RegularFile();
-            
-            virtual void printToSystem() override;
-            virtual void readFromSystem(int &line) override;
-            virtual void showContents() const override;
 
-            void fileToVector(string filePath);
+            virtual void printToSystem() override; // Overrides the virtual function
+            virtual void readFromSystem(int &line) override; // Overrides the virtual function
+            virtual void showContents() const override; // Overrides the virtual function
+            void fileToVector(string filePath); // Reads from the OSKeskin.txt & adds to the data
 
+            // Getters & setters
             size_t getSize() const;
             vector<string> getData() const;
             void setData(const vector<string> &data);
             
-            //Iterator Class
+            // Iterator Class
             class iterator
             {
                 public:
@@ -54,7 +54,7 @@ namespace FileSystemKeskin
             }
             
         private:
-            size_t size;
+            size_t size; // Holds the size of the data, i used this to calculate the 10MB size
             vector<string> data;
     };
 }

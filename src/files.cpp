@@ -4,8 +4,8 @@ using namespace std;
 /*------------------------------------ FILE CLASS IMPLEMENTATION ------------------------------------*/
 namespace FileSystemKeskin
 {
-    File::File() {}
-    File::File(string _type) : type(_type)
+    File::File() { /*Default is enough */}
+    File::File(string _type) : type(_type) // Setting the time when the object gets created
     { 
         time_t currentTime = std::time(nullptr);
         time = std::ctime(&currentTime);
@@ -13,6 +13,7 @@ namespace FileSystemKeskin
     }
     File::~File() { /*Default is enough*/ }
 
+    // Setters & getters
     const string File::getName() const { return name; }
     const string File::getPath() const { return path; }
     const string File::getType() const { return type; }
@@ -22,17 +23,17 @@ namespace FileSystemKeskin
     void File::setType(const string &t) { type = t; }
     void File::setTime(const string &t) { time = t; }
     
-    void File::printToSystem() // Print obj to system
+    void File::printToSystem() // Virtual function to print the information and data (if there is) to the OSKeskin.txt
     {
         ofstream os("OSKeskin.txt", std::ios::app);
         if(!os.is_open())
         {
             throw invalid_argument("OS cannot open!\n");
         }
-        os << type << " " << path << " " << name << " " << time << " ";
+        os << type << " " << path << " " << name << " " << time << " "; // Printing the base classes members
         os.close();
     }
-    void File::splitLine(const string &input, vector<string> &vect)
+    void File::splitLine(const string &input, vector<string> &vect) // General use function to split the string
     {
         stringstream ss(input);
         string word;
