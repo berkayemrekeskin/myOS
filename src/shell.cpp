@@ -84,15 +84,20 @@ namespace ShellKeskin
             {
                 SoftLinkedFile *obj = new SoftLinkedFile;
                 obj->readFromSystem(lineCounter);
+                bool isPointerAlive = false;
                 for(auto elm : this->files->getElements())
                 {
                     if(elm->getPath() == obj->getLinkedPath())
                     {
+                        isPointerAlive = true;
                         obj->setPointer(dynamic_cast<RegularFile*>(elm));
                         break;
                     }
                 }
-                this->fileSize += obj->getPointer()->getSize();
+                if(!isPointerAlive)
+                    obj->setPointer(nullptr);
+                if(obj->getPointer() != nullptr)
+                    this->fileSize += obj->getPointer()->getSize();
                 this->addToFiles(obj);
                 if(obj->getPath() == absolutePath(obj,rootDirectory))
                     rootDirectory->addElements(obj);
@@ -115,13 +120,6 @@ namespace ShellKeskin
 
         this->addToFolders(); // Add special directories elements to themselves
         this->assignParents(); // Assign parents of directories
-        
-        cout << "startOS - FILES READ" << endl;
-        for(auto elm : this->files->getElements())
-        {
-            cout << elm->getName() << " " << elm->getPath() << endl;
-        }
-
         this->checkInput(); // Get & check input
     }
 
@@ -158,7 +156,6 @@ namespace ShellKeskin
     }
     void Shell::lsPrint(const Directory* current) // Print current directory
     {
-        cout << "TOTAL SIZE : " << this->fileSize << endl;
         if(current == rootDirectory)
         {
             cout << "D " << "." << "        " << files->getTime() << endl;
@@ -179,12 +176,16 @@ namespace ShellKeskin
                 else if(elm->getType() == "ft_regular")
                 {
                     RegularFile * obj = dynamic_cast<RegularFile *>(elm);
-                    cout << "F " << obj->getName() << "        " << obj->getTime() << "        " << obj->getSize() << endl;
+                    cout << "F " << obj->getName() << "        " << obj->getTime() << "        " << obj->getSize() << "Bytes" << endl;
                 }
                 else if(elm->getType() == "ft_linked")
                 {
                     SoftLinkedFile * obj = dynamic_cast<SoftLinkedFile *>(elm);
-                    cout << "L " << obj->getName() << "        " << obj->getTime() << "        " << obj->getPointer()->getSize() << endl;
+                    cout << "L " << obj->getName() << "        " << obj->getTime();
+                    if(obj->getPointer() == nullptr)
+                        cout << "        " << "Pointed file is removed!" << endl;
+                    else
+                        cout <<  "        " << obj->getName() << " -> " << obj->getLinkedPath() << endl;
                 }
             }
         }
@@ -214,13 +215,6 @@ namespace ShellKeskin
                     {
                         //Remove directory from OSKeskin
                         rmdir(elm,currentDirectory);
-
-                        cout << "rmdir - CURRENT FILES" << endl;
-                        for(auto elm: this->currentDirectory->getElements())
-                        {
-                            cout << elm->getName() << " " << elm->getPath() << endl;
-                        }
-
                         remove("OSKeskin.txt");
                         this->addToOS();
                         return;
@@ -236,28 +230,22 @@ namespace ShellKeskin
             obj->printToSystem();
             currentDirectory->addElements(obj);
 
-            cout << "mkdir - CURRENT FILES" << endl;
-            for(auto elm: this->currentDirectory->getElements())
-            {
-                cout << elm->getName() << " " << elm->getPath() << endl;
-            }
+            this->fileSize += 4096;
         }
     }
     void Shell::removeFromFiles(File* file, Directory* current) // Remove from files
     {
         if(dynamic_cast<RegularFile*>(file))
         {
-            cout << "removeFromFiles - REGULAR(FIRST) = " << this->fileSize <<endl;
             this->fileSize -= dynamic_cast<RegularFile*>(file)->getSize();
-            cout << "removeFromFiles - REGULAR(LAST) = " << this->fileSize <<endl;
-
         }
-        else if(dynamic_cast<SoftLinkedFile*>(file))
+        else if(dynamic_cast<SoftLinkedFile*>(file) && dynamic_cast<SoftLinkedFile*>(file)->getPointer() != nullptr )
         {
-            cout << "removeFromFiles - LINKED(FIRST) = " << this->fileSize << endl;
             this->fileSize -= dynamic_cast<SoftLinkedFile*>(file)->getPointer()->getSize();
-            cout << "removeFromFiles - LINKED(LAST) = " << this->fileSize <<endl;
-
+        }
+        else if(dynamic_cast<Directory*>(file))
+        {
+            this->fileSize -= 4096;
         }
         this->files->removeFile(file);
         this->currentDirectory->removeFile(file);
@@ -282,17 +270,6 @@ namespace ShellKeskin
             this->files->removeFile(file);
             this->currentDirectory->removeFile(file);
         }
-        cout << "rmdir - FILES AFTER REMOVE" << endl;
-        for(auto elm : this->files->getElements())
-        {
-            cout << elm->getName() << " " << elm->getPath() << endl;
-        }
-        cout << "rmdir - CURRENT AFTER REMOVE" << endl;
-        for(auto elm : this->currentDirectory->getElements())
-        {
-            cout << elm->getName() << " " << elm->getPath() << endl;
-        }
-        
     }
     /*----------------------------------------- (RM) -----------------------------------------*/
     // Remove files
@@ -308,11 +285,6 @@ namespace ShellKeskin
         }
         else
         {
-            cout << "rm - CURRENT FILES BEFORE" << endl;
-            for(auto elm : this->currentDirectory->getElements())
-            {
-                cout << elm->getName() << " " << elm->getPath() << endl;
-            }
             bool isFound = false;
             for(auto removed : this->files->getElements())
             {
@@ -339,12 +311,26 @@ namespace ShellKeskin
                                 temp_parent.push_back(elm);
                             }
                         }
+                        if(dynamic_cast<RegularFile*>(removed))
+                        {
+                            for(auto elm : this->files->getElements())
+                            {
+                                if(dynamic_cast<SoftLinkedFile*>(elm))
+                                {
+                                    if(dynamic_cast<SoftLinkedFile*>(elm)->getPointer() == dynamic_cast<RegularFile*>(removed))
+                                    {
+                                        dynamic_cast<SoftLinkedFile*>(elm)->setPointer(nullptr);
+                                    }
+                                }
+                            }
+                        }
+                        
                         //Delete the file
                         this->files->setElements(temp_files);
                         this->currentDirectory->setElements(temp_parent);
                         if(dynamic_cast<RegularFile*>(removed))
                             this->fileSize -= dynamic_cast<RegularFile*>(removed)->getSize();
-                        else if(dynamic_cast<SoftLinkedFile*>(removed))
+                        else if(dynamic_cast<SoftLinkedFile*>(removed) && dynamic_cast<SoftLinkedFile*>(removed)->getPointer() != nullptr)  
                             this->fileSize -= dynamic_cast<SoftLinkedFile*>(removed)->getPointer()->getSize();
 
                         delete removed;
@@ -358,15 +344,9 @@ namespace ShellKeskin
             {
                 throw invalid_argument("rm: file not found!");
             }
-            cout << "rm - CURRENT FILES AFTER" << endl;
-            for(auto elm : this->currentDirectory->getElements())
-            {
-                cout << elm->getName() << " " << elm->getPath() << endl;
-            }
         }
     }
     /*----------------------------------------- (CP) -----------------------------------------*/
-    // Copy files & directories
     void Shell::cp()
     {
         //Check if file is already in OSKeskin
@@ -385,11 +365,6 @@ namespace ShellKeskin
         }
         else
         {
-            cout << "cp - FILES BEFORE" << endl;
-            for(auto elm : this->files->getElements())
-            {
-                cout << elm->getName() << " " << elm->getPath() << endl;
-            }
             bool isDirectoryIn = false;
             bool OSKeskinFile = false;
             for(auto elm : this->files->getElements())
@@ -407,16 +382,12 @@ namespace ShellKeskin
                         cp_directory(newDirectory,dynamic_cast<Directory*>(elm));
                         this->files->addElements(newDirectory);
                         this->currentDirectory->addElements(newDirectory);
-                        
-                        cout << "cp - FILES AFTER" << endl;
-                        for(auto elm : this->files->getElements())
+                        for(auto elm : newDirectory->getElements())
                         {
-                            cout << elm->getName() << " " << elm->getPath() << endl;
-                        }
-                        cout << "cp - CURRENT FILES AFTER" << endl;
-                        for(auto elm : this->currentDirectory->getElements())
-                        {
-                            cout << elm->getName() << " " << elm->getPath() << endl;
+                            if(dynamic_cast<SoftLinkedFile*>(elm))
+                            {
+                                link_recursive(dynamic_cast<SoftLinkedFile*>(elm),newDirectory);
+                            }
                         }
                         remove("OSKeskin.txt");
                         this->addToOS();
@@ -490,7 +461,6 @@ namespace ShellKeskin
                     throw runtime_error("size: size becomes bigger than 10mb!");
                 this->fileSize += obj->getSize();
 
-
                 obj->printToSystem();
                 this->addToFiles(obj);
                 this->currentDirectory->addElements(obj);
@@ -530,7 +500,8 @@ namespace ShellKeskin
                 copyLinked->setName(elm->getName());
                 copyLinked->setPath(absolutePath(copyLinked,newDirectory));
                 copyLinked->setLinkedPath(dynamic_cast<SoftLinkedFile*>(elm)->getLinkedPath());
-                
+                cout << dynamic_cast<SoftLinkedFile*>(elm)->getLinkedPath() << endl;
+
                 newDirectory->addElements(copyLinked);
                 addToFiles(copyLinked);
             }
@@ -561,14 +532,14 @@ namespace ShellKeskin
             }
         }
     }
-    void Shell::link_recursive(SoftLinkedFile* linked, Directory* current)
+    void Shell::link_recursive(SoftLinkedFile* linked, Directory* newDirectory)
     {
-        for(auto elm : current->getElements())
+        for(auto elm : newDirectory->getElements())
         {
             if(dynamic_cast<RegularFile*>(elm))
             {
-                if(elm->getPath().substr(elm->getPath().find_last_not_of("/"),elm->getPath().size()) == 
-                linked->getLinkedPath().substr(linked->getLinkedPath().find_last_not_of("/"),linked->getLinkedPath().size()))
+                if(elm->getPath().substr(elm->getPath().find_last_of("/"),elm->getPath().size()) == 
+                linked->getLinkedPath().substr(linked->getLinkedPath().find_last_of("/"),linked->getLinkedPath().size()))
                 {
                     if(this->fileSize + dynamic_cast<RegularFile*>(elm)->getSize() > MAX_SIZE)
                         throw runtime_error("size: size becomes bigger than 10mb!");
@@ -590,6 +561,10 @@ namespace ShellKeskin
     void Shell::link()
     {
         if(inputs.size() == 1)
+        {
+            throw invalid_argument("link: no file name given!");
+        }
+        else if(inputs.size() == 2 && inputs[2] == "")
         {
             throw invalid_argument("link: no file name given!");
         }
@@ -760,7 +735,12 @@ namespace ShellKeskin
                     if(this->inputs[1] == elm->getName() && elm->getPath() == absolutePath(elm,currentDirectory)) // If file is found
                     {
                         isFound = true; 
-                        elm->showContents(); // Show contents of file
+                        if(dynamic_cast<Directory*>(elm))
+                            throw invalid_argument("cat: cannot show contents of directory!");
+                        else if(dynamic_cast<SoftLinkedFile*>(elm) && dynamic_cast<SoftLinkedFile*>(elm)->getPointer() == nullptr)
+                            throw invalid_argument("cat: cannot show contents of removed file!");
+                        else
+                            elm->showContents(); // Show contents of file
                         return ;
                     }
                 }
@@ -769,7 +749,12 @@ namespace ShellKeskin
                     if(this->inputs[1] == elm->getPath()) // If path is found
                     {
                         isFound = true;
-                        elm->showContents(); // Show contents of file
+                        if(dynamic_cast<Directory*>(elm))
+                            throw invalid_argument("cat: cannot show contents of directory!");
+                        else if(dynamic_cast<SoftLinkedFile*>(elm) && dynamic_cast<SoftLinkedFile*>(elm)->getPointer() == nullptr)
+                            throw invalid_argument("cat: cannot show contents of removed file!");
+                        else
+                            elm->showContents(); // Show contents of file
                         return ;
                     }
                 }

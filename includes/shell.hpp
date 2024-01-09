@@ -55,6 +55,8 @@ namespace ShellKeskin
                 void cd_checkPaths();
                 // CAT FILES & DIRECTORIES
                 void cat();
+
+                void check(Directory* current, Directory* totalDirectory); 
         private:
             Directory* files; // Holds all the files in the OSKeskin.txt
             Directory* currentDirectory; // Holds the current directory

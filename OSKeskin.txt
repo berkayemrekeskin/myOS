@@ -1,2 +1,42 @@
-ft_linked /new/linked linked Tue Jan  9 14:53:48 2024 /new/another 480
-ft_directory /new new Tue Jan  9 14:53:48 2024 
+ft_directory /olkay olkay Tue Jan 9 16:53:48 2024 
+ft_directory /olkay/yeni yeni Tue Jan 9 16:53:56 2024 
+ft_regular /olkay/yeni/time time Tue Jan 9 16:54:20 2024 480
+#include <iostream>
+#include <chrono>
+
+int main() {
+    // Get the current time point
+    auto currentTimePoint = std::chrono::system_clock::now();
+
+    // Convert the time point to a time_t (typically representing seconds since epoch)
+    std::time_t currentTime = std::chrono::system_clock::to_time_t(currentTimePoint);
+
+    // Print the current time
+    std::cout << "Current time: " << std::ctime(&currentTime);
+
+    return 0;
+}
+$
+ft_directory /olkay/yeni/newdir newdir Tue Jan 9 16:54:25 2024 
+ft_linked /olkay/yeni/newdir/linked linked Tue Jan 9 16:54:34 2024 /olkay/yeni/time 480
+ft_directory /new/yeni yeni Tue Jan  9 17:33:31 2024 
+ft_regular /new/yeni/time time Tue Jan  9 17:33:31 2024 480
+#include <iostream>
+#include <chrono>
+
+int main() {
+    // Get the current time point
+    auto currentTimePoint = std::chrono::system_clock::now();
+
+    // Convert the time point to a time_t (typically representing seconds since epoch)
+    std::time_t currentTime = std::chrono::system_clock::to_time_t(currentTimePoint);
+
+    // Print the current time
+    std::cout << "Current time: " << std::ctime(&currentTime);
+
+    return 0;
+}
+$
+ft_directory /new/yeni/newdir newdir Tue Jan  9 17:33:31 2024 
+ft_linked /new/yeni/newdir/linked linked Tue Jan  9 17:33:31 2024 RegularRemoved 0
+ft_directory /new new Tue Jan  9 17:33:31 2024 
