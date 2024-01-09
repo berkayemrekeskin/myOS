@@ -355,13 +355,17 @@ namespace ShellKeskin
             if(inputs[2] == elm->getName())
                 throw invalid_argument("cp: file occurs on current directory!");
         }
-        if(inputs.size() == 1)
+        if(inputs.size() == 2)
         {
             throw invalid_argument("cp: no file or directory name given!");
         }
         else if(inputs.size() > 3)
         {
             throw invalid_argument("cp: too much inputs!");
+        }
+        else if(inputs[2] == ".")
+        {
+            throw invalid_argument("cp: cannot name a file '.'!");
         }
         else
         {
@@ -560,11 +564,11 @@ namespace ShellKeskin
     {
         if(inputs.size() == 1)
         {
-            throw invalid_argument("link: no file name given!");
+            throw invalid_argument("link: no source and destination name given!");
         }
-        else if(inputs.size() == 2 && inputs[2] == "")
+        else if(inputs.size() == 2)
         {
-            throw invalid_argument("link: no file name given!");
+            throw invalid_argument("link: no destination name given!");
         }
         else if(inputs.size() > 3)
         {
@@ -572,9 +576,14 @@ namespace ShellKeskin
         }
         else
         {
+            for(auto elm : this->currentDirectory->getElements())
+            {
+                if(inputs[2] == elm->getName())
+                    throw invalid_argument("link: file occurs on current directory!");
+            }
             //Check if file is in OSKeskin
             bool isRegularFound = false;
-            for(auto elm : this->files->getElements())
+            for(auto elm : this->currentDirectory->getElements())
             {
                 if(dynamic_cast<RegularFile*>(elm))
                 {
@@ -843,13 +852,13 @@ namespace ShellKeskin
     }
     void Shell::checkInput() // Check input
     {
-            string input;
-            vector<string> empty;
             bool isDone = false;
             while(!isDone)  // Check input until quit
             {
                 try // Check if there is an error
                 {   
+                    string input;
+                    vector<string> empty;
                     inputs = empty; // Clear the inputs
                     this->transformInput(input); // Transform input
 

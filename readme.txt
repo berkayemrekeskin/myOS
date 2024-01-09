@@ -1,5 +1,3 @@
-ft_directory /dir1 dir1 Tue Jan 9 19:15:10 2024 
-ft_regular /file file Tue Jan 9 19:15:33 2024 800
 Name & Surname: Berkay Emre KESKIN
 Class : CSE241
 Homework 2
@@ -25,5 +23,3 @@ In this homework, i generally try to write according to the pdf file. Below this
         My Shell class handles all the commands accordingly to the PDF file. I wanted to make the names same with
     the commands so cat function's name is showContents.
     
-$
-ft_linked /olkay olkay Tue Jan  9 19:23:50 2024 /file 800
