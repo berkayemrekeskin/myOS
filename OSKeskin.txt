@@ -1,6 +1,5 @@
-ft_directory /olkay olkay Tue Jan 9 16:53:48 2024 
-ft_directory /olkay/yeni yeni Tue Jan 9 16:53:56 2024 
-ft_regular /olkay/yeni/time time Tue Jan 9 16:54:20 2024 480
+ft_directory /test test Tue Jan  9 17:42:49 2024 
+ft_regular /test/file file Tue Jan  9 17:44:10 2024 480
 #include <iostream>
 #include <chrono>
 
@@ -17,10 +16,9 @@ int main() {
     return 0;
 }
 $
-ft_directory /olkay/yeni/newdir newdir Tue Jan 9 16:54:25 2024 
-ft_linked /olkay/yeni/newdir/linked linked Tue Jan 9 16:54:34 2024 /olkay/yeni/time 480
-ft_directory /new/yeni yeni Tue Jan  9 17:33:31 2024 
-ft_regular /new/yeni/time time Tue Jan  9 17:33:31 2024 480
+ft_linked /test/linked linked Tue Jan  9 17:44:15 2024 /test/file 480
+ft_directory /test/nig nig Tue Jan  9 17:45:03 2024 
+ft_regular /new/file file Tue Jan  9 17:46:21 2024 480
 #include <iostream>
 #include <chrono>
 
@@ -37,6 +35,6 @@ int main() {
     return 0;
 }
 $
-ft_directory /new/yeni/newdir newdir Tue Jan  9 17:33:31 2024 
-ft_linked /new/yeni/newdir/linked linked Tue Jan  9 17:33:31 2024 RegularRemoved 0
-ft_directory /new new Tue Jan  9 17:33:31 2024 
+ft_linked /new/linked linked Tue Jan  9 17:46:21 2024 /new/file 480
+ft_directory /new/nig nig Tue Jan  9 17:46:21 2024 
+ft_directory /new new Tue Jan  9 17:46:21 2024 

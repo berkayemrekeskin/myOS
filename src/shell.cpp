@@ -500,8 +500,6 @@ namespace ShellKeskin
                 copyLinked->setName(elm->getName());
                 copyLinked->setPath(absolutePath(copyLinked,newDirectory));
                 copyLinked->setLinkedPath(dynamic_cast<SoftLinkedFile*>(elm)->getLinkedPath());
-                cout << dynamic_cast<SoftLinkedFile*>(elm)->getLinkedPath() << endl;
-
                 newDirectory->addElements(copyLinked);
                 addToFiles(copyLinked);
             }
@@ -728,9 +726,9 @@ namespace ShellKeskin
         else
         {
             bool isFound = false;
-            for(auto elm : this->currentDirectory->getElements())
+            if(this->inputs[1][0] != '/')
             {
-                if(this->inputs[1][0] != '/')   
+                for(auto elm : this->currentDirectory->getElements())
                 {
                     if(this->inputs[1] == elm->getName() && elm->getPath() == absolutePath(elm,currentDirectory)) // If file is found
                     {
@@ -744,7 +742,10 @@ namespace ShellKeskin
                         return ;
                     }
                 }
-                else
+            }
+            else
+            {
+                for(auto elm : this->files->getElements())
                 {
                     if(this->inputs[1] == elm->getPath()) // If path is found
                     {
