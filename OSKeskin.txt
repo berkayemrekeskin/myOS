@@ -1,0 +1,2 @@
+ft_linked /new/linked linked Tue Jan  9 14:53:48 2024 /new/another 480
+ft_directory /new new Tue Jan  9 14:53:48 2024 

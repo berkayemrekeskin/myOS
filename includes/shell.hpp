@@ -3,10 +3,11 @@
 
 #include "../includes/files.hpp"
 #include "../includes/directory_file.hpp"
+#include "../includes/regular_file.hpp"
+#include "../includes/linked_file.hpp"
 
 using namespace std;
 using namespace FileSystemKeskin;
-
 
 namespace ShellKeskin
 {
@@ -44,7 +45,8 @@ namespace ShellKeskin
                 void rm();
                 // CP FILES & DIRECTORIES
                 void cp();
-                void cp_directory(Directory* newDirectory,Directory* current);
+                void cp_directory(Directory* newDirectory, Directory* current);
+                void link_recursive(SoftLinkedFile* linked,Directory* current);
                 // LINK FILES
                 void link();
                 // CD DIRECTORIES
