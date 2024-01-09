@@ -203,6 +203,10 @@ namespace ShellKeskin
         {
             throw invalid_argument("mkdir: too much inputs!");
         }
+        else if(this->inputs[1] == ".")
+        {
+            throw invalid_argument("mkdir: cannot name a directory '.'!");
+        }
         else
         {
             //Check if directory is already in OSKeskin
@@ -282,6 +286,10 @@ namespace ShellKeskin
         else if(this->inputs.size() > 2)
         {
             throw invalid_argument("rm: too much inputs!");
+        }
+        else if(this->inputs[2] == ".")
+        {
+            throw invalid_argument("rm: cannot name a file '.'!");
         }
         else
         {

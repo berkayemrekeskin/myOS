@@ -1,29 +1,4 @@
-ft_directory /dir1 dir1 Tue Jan 9 19:15:10 2024 
-ft_regular /file file Tue Jan 9 19:15:33 2024 800
-Name & Surname: Berkay Emre KESKIN
-Class : CSE241
-Homework 2
-
-In this homework, i generally try to write according to the pdf file. Below this text, i will introduce my code and algorithm.
-
-    Commands & their use:   
-
-        -ls & ls -R = Lists the contents of the current directory, ls -R lists recursively.
-        -mkdir = My mkdir makes and removes directories. If there is a directory created and the input name is same with that directory,
-    i remove that directory. If the input is unique, than it creates a directory. (as the pdf told)
-        -rm = removes a Regular or Linked file.
-        -cp = My cp copies files inside & outside of the OS, also it can copy directories and their elements inside the OS.
-        -link = makes a link with a Regular file
-        -cd = Changes the current directory with the given path
-        -cat = Prints the data inside the files.
-        -quit = Quits from the shell
-
-    My Notes:
-
-        PDF tolds that cat should be in the File abstract class, i made it in the abstract class but it's name
-    is showContents. I have some pure virtual functions in my abstract File class to do file read & write.
-        My Shell class handles all the commands accordingly to the PDF file. I wanted to make the names same with
-    the commands so cat function's name is showContents.
-    
-$
-ft_linked /olkay olkay Tue Jan  9 19:23:50 2024 /file 800
+ft_directory /test/dir2 dir2 Tue Jan  9 21:25:32 2024 
+ft_linked /test/dir2/linked linked Tue Jan  9 21:25:32 2024 RegularRemoved 0
+ft_directory /test test Tue Jan  9 21:25:32 2024 
+ft_directory /new new Tue Jan  9 21:26:46 2024 
